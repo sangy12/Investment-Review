@@ -20,6 +20,7 @@ dependencies = [
     "packaging>=24.0",
     "pandas>=3.0.6",
     "python-dotenv>=1.0.0",
+    "PyYAML>=6.0.2",
     "pytz>=2025.2",
     "questionary>=2.1.0",
     "requests>=2.32.4",
@@ -31,6 +32,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+china = ["akshare>=1.17"]
 dev = [
     "ruff>=0.16",
     "pytest>=8.0",
@@ -44,6 +46,7 @@ bedrock = [
 
 [project.scripts]
 tradingagents = "cli.main:app"
+ta-watchlist = "tradingagents.watchlist.cli:app"
 
 [tool.setuptools.dynamic]
 version = {attr = "tradingagents.__version__"}

@@ -11,5 +11,8 @@ build
 dist
 results
 eval_results
+reports
+.runtime
+**/*chatgpt-auth*.json
 Dockerfile
 docker-compose.yml

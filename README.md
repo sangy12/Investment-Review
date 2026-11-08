@@ -4,6 +4,10 @@
 
 # TradingAgents: Multi-Agents LLM Financial Trading Framework
 
+本分支的基本面长期投资红队扩展：[运行、登录与验收说明](docs/REDTEAM.md) · [A 股／港股数据源比较](docs/DATA_SOURCES.md)。新增 `ta-watchlist`，保留上游代理决策核心与完整报告，仅用于研究。
+
+当前 Codex Cloud 实例因网络策略受限，需要切换新环境继续：[云端登录与新对话交接](docs/CLOUD_HANDOFF.md)。
+
 <div align="center" style="line-height: 1;">
   <a href="https://arxiv.org/abs/2412.20138" target="_blank"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2412.20138-B31B1B?logo=arxiv"/></a>
   <a href="https://discord.com/invite/hk9PGKShPK" target="_blank"><img alt="Discord" src="https://img.shields.io/badge/Discord-TradingResearch-7289da?logo=discord&logoColor=white&color=7289da"/></a>

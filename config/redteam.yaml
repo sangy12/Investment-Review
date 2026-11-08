@@ -1,0 +1,27 @@
+# TradingAgents v0.7.1 opt-in profile. Official quick default is gpt-6-luna;
+# gpt-6.1-terra below is the user's requested override, not an upstream default.
+llm_provider: chatgpt
+deep_think_provider: chatgpt
+quick_think_provider: chatgpt
+deep_think_llm: gpt-6-sol
+quick_think_llm: gpt-6.1-terra
+# If unavailable, `ta-watchlist models` lists the signed-in plan's choices.
+# Record the chosen replacement and reason here; never silently switch providers.
+openai_reasoning_effort: high
+max_debate_rounds: 2
+max_risk_discuss_rounds: 2
+output_language: Chinese
+max_tool_rounds: 20
+checkpoint_enabled: true
+data_vendors:
+  core_stock_apis: yfinance
+  fundamental_data: sec_edgar,yfinance
+  news_data: yfinance
+  macro_data: fred
+# Optional AKShare candidate; defaults await the user's source comparison.
+# Uncomment after `pip install '.[china]'` to enable it only for A/H shares.
+# china_data_vendors:
+#   core_stock_apis: yfinance,akshare
+#   fundamental_data: sec_edgar,yfinance,akshare
+#   news_data: akshare,yfinance
+#   macro_data: akshare

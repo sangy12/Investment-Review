@@ -1,0 +1,26 @@
+# syntax=docker/dockerfile:1
+FROM python:3.13-slim AS builder
+ENV PYTHONDONTWRITEBYTECODE=1 PIP_DISABLE_PIP_VERSION_CHECK=1
+WORKDIR /build
+COPY . .
+RUN python -m venv /opt/venv
+# proxy_ca is optional outside managed Cloud; never store session CA in a layer.
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then \
+      PIP_CERT=/run/secrets/proxy_ca /opt/venv/bin/pip install --no-cache-dir '.[china]'; \
+    else /opt/venv/bin/pip install --no-cache-dir '.[china]'; fi
+
+FROM python:3.13-slim
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH" TRADINGAGENTS_IN_DOCKER=1 TZ=Asia/Shanghai
+RUN useradd --create-home appuser \
+    && install -d -o appuser -g appuser /home/appuser/.tradingagents /research/reports
+COPY --from=builder --chown=appuser:appuser /build/watchlist.yaml /research/watchlist.yaml
+COPY --from=builder --chown=appuser:appuser /build/config /research/config
+# Keep the large environment in the last filesystem layer: Cloud uses VFS,
+# which otherwise copies the whole environment for every later COPY/RUN.
+COPY --from=builder /opt/venv /opt/venv
+USER appuser
+WORKDIR /research
+ENTRYPOINT ["ta-watchlist"]
+CMD ["--help"]

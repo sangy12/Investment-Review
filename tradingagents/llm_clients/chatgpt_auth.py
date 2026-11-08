@@ -42,7 +42,8 @@ REFRESH_MARGIN = 300          # refresh when the access token has under 5 minute
 RETRY_AFTER = 60              # after OpenAI could not renew, wait this long before trying again
 TIMEOUT = 30
 
-AUTH_FILE = Path(_TRADINGAGENTS_HOME) / "chatgpt-auth.json"
+AUTH_FILE = Path(os.environ.get("TRADINGAGENTS_CHATGPT_AUTH_FILE") or
+                 (Path(_TRADINGAGENTS_HOME) / "chatgpt-auth.json")).expanduser()
 LOGIN_HINT = "Not signed in to ChatGPT; run `tradingagents login chatgpt`."
 
 

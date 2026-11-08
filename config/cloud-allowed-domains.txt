@@ -1,0 +1,27 @@
+# Add to Codex Cloud > Investment-Review > Additional allowed domains.
+# These are destinations only; adding them does not provide credentials.
+auth.openai.com
+api.openai.com
+chatgpt.com
+query1.finance.yahoo.com
+query2.finance.yahoo.com
+fc.yahoo.com
+www.sec.gov
+data.sec.gov
+emweb.securities.eastmoney.com
+datacenter.eastmoney.com
+datacenter-web.eastmoney.com
+push2his.eastmoney.com
+push2.eastmoney.com
+search-api-web.eastmoney.com
+np-weblist.eastmoney.com
+ai-news-search.futunn.com
+mcp.51ifind.com
+api-mcp.51ifind.com
+choice.eastmoney.com
+mxapi.eastmoney.com
+www.futunn.com
+# Optional Futu account/quote investigation only; do not run default OAuth
+# until a read-only permission scope is verified (the current CLI asks trade:write).
+webapi.futunn.com
+ai-report.futunn.com

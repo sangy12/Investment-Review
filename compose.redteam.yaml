@@ -1,0 +1,25 @@
+services:
+  redteam:
+    build:
+      context: .
+      dockerfile: Dockerfile.redteam
+    environment:
+      TZ: Asia/Shanghai
+      TRADINGAGENTS_CHATGPT_AUTH_SOURCE: /run/secrets/chatgpt_auth
+      SEC_EDGAR_USER_AGENT: ${SEC_EDGAR_USER_AGENT:-}
+      FRED_API_KEY: ${FRED_API_KEY:-}
+    secrets:
+      - chatgpt_auth
+    volumes:
+      # Writable store is required: official refresh tokens rotate under a lock.
+      - redteam_auth:/home/appuser/.tradingagents
+      - ./watchlist.yaml:/research/watchlist.yaml:ro
+      - ./config:/research/config:ro
+      - ./reports:/research/reports
+    command: ["run"]
+
+secrets:
+  chatgpt_auth:
+    file: ${CHATGPT_AUTH_SOURCE:?Set CHATGPT_AUTH_SOURCE to the official auth JSON path}
+volumes:
+  redteam_auth:

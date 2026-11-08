@@ -1,0 +1,128 @@
+{
+  "generated_at": "2026-11-08T09:42:01.616965+00:00",
+  "network": [
+    {
+      "name": "openai_auth",
+      "url": "https://auth.openai.com/.well-known/jwks.json",
+      "data_accepted": false,
+      "status": "network_blocked",
+      "error_type": "ProxyError"
+    },
+    {
+      "name": "openai_models",
+      "url": "https://api.openai.com/v1/models",
+      "data_accepted": false,
+      "status": "network_blocked",
+      "error_type": "ProxyError"
+    },
+    {
+      "name": "yahoo_nvda",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/NVDA?range=5d&interval=1d",
+      "data_accepted": false,
+      "status": "network_blocked",
+      "error_type": "ProxyError"
+    },
+    {
+      "name": "yahoo_maotai",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/600519.SS?range=5d&interval=1d",
+      "data_accepted": false,
+      "status": "network_blocked",
+      "error_type": "ProxyError"
+    },
+    {
+      "name": "yahoo_tencent",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/0700.HK?range=5d&interval=1d",
+      "data_accepted": false,
+      "status": "network_blocked",
+      "error_type": "ProxyError"
+    },
+    {
+      "name": "akshare_a_origin",
+      "url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index",
+      "data_accepted": false,
+      "status": "network_blocked",
+      "error_type": "ProxyError"
+    },
+    {
+      "name": "akshare_hk_origin",
+      "url": "https://datacenter.eastmoney.com/securities/api/data/v1/get",
+      "data_accepted": false,
+      "status": "network_blocked",
+      "error_type": "ProxyError"
+    },
+    {
+      "name": "futu_news",
+      "url": "https://ai-news-search.futunn.com/news_search?keyword=Tencent&size=3&news_type=1&lang=zh-CN&sort_type=2",
+      "data_accepted": false,
+      "status": "network_blocked",
+      "error_type": "ProxyError"
+    },
+    {
+      "name": "ifind_portal",
+      "url": "https://mcp.51ifind.com/",
+      "data_accepted": false,
+      "status": "network_blocked",
+      "error_type": "ProxyError"
+    },
+    {
+      "name": "miaoxiang_mcp",
+      "url": "https://mxapi.eastmoney.com/mxds/mcp",
+      "data_accepted": false,
+      "status": "network_blocked",
+      "error_type": "ProxyError"
+    }
+  ],
+  "data": [
+    {
+      "name": "yahoo_nvda",
+      "status": "not_tested_origin_unreachable",
+      "data_accepted": false
+    },
+    {
+      "name": "yahoo_maotai",
+      "status": "not_tested_origin_unreachable",
+      "data_accepted": false
+    },
+    {
+      "name": "yahoo_tencent",
+      "status": "not_tested_origin_unreachable",
+      "data_accepted": false
+    },
+    {
+      "name": "akshare_maotai",
+      "status": "not_tested_origin_unreachable",
+      "data_accepted": false
+    },
+    {
+      "name": "akshare_tencent",
+      "status": "not_tested_origin_unreachable",
+      "data_accepted": false
+    },
+    {
+      "name": "futu_tencent_news",
+      "status": "not_tested_origin_unreachable",
+      "data_accepted": false
+    },
+    {
+      "name": "historical_guard_600519.SS",
+      "status": "safety_guard_passed",
+      "data_accepted": false,
+      "note": "Guard check only; not a live financial-data pass."
+    },
+    {
+      "name": "historical_guard_0700.HK",
+      "status": "safety_guard_passed",
+      "data_accepted": false,
+      "note": "Guard check only; not a live financial-data pass."
+    }
+  ],
+  "auth": {
+    "credentials_present": false,
+    "sec_user_agent_configured": false
+  },
+  "pending": [
+    "iFinD/Miaoxiang authenticated tools/list and per-field tests",
+    "Futu quote OAuth scopes and available data rights",
+    "No pricing/free-quota claim has been verified by these probes."
+  ]
+}

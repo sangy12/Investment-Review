@@ -6,6 +6,7 @@ from tradingagents.dataflows.errors import (
     VendorNotConfiguredError,
     VendorUnavailableError,
 )
+from tradingagents.dataflows.vendors import akshare as akshare_vendor
 from tradingagents.dataflows.vendors.alpha_vantage import (
     get_balance_sheet as get_alpha_vantage_balance_sheet,
     get_cashflow as get_alpha_vantage_cashflow,
@@ -147,6 +148,19 @@ VENDOR_METHODS = {
         "polymarket": get_polymarket_prediction_markets,
     },
 }
+
+# Lazy optional dependency: importing this vendor does not import AKShare itself.
+for _method, _implementation in {
+    "get_stock_data": akshare_vendor.get_stock_data,
+    "get_fundamentals": akshare_vendor.get_fundamentals,
+    "get_balance_sheet": akshare_vendor.get_balance_sheet,
+    "get_cashflow": akshare_vendor.get_cashflow,
+    "get_income_statement": akshare_vendor.get_income_statement,
+    "get_news": akshare_vendor.get_news,
+    "get_global_news": akshare_vendor.get_global_news,
+    "get_macro_indicators": akshare_vendor.get_macro_data,
+}.items():
+    VENDOR_METHODS[_method]["akshare"] = _implementation
 
 
 def get_category_for_method(method: str) -> str:

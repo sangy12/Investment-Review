@@ -221,3 +221,8 @@ __marimo__/
 # Enterprise env file (secrets) and generated run reports
 .env.enterprise
 reports/
+# Red-team research artifacts and credentials
+/reports/
+/.runtime/
+*chatgpt-auth*.json
+*.selected.yaml

@@ -1,0 +1,14 @@
+updated: 2026-11-08
+positions:
+  - ticker: NVDA
+    name: NVIDIA
+    market: US
+    thesis: ""
+  - ticker: 600519.SS
+    name: 贵州茅台
+    market: A_SHARE
+    thesis: ""
+  - ticker: 0700.HK
+    name: 腾讯控股
+    market: HK
+    thesis: ""
