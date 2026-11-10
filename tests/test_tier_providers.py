@@ -88,3 +88,65 @@ def test_the_tier_settings_are_read_from_the_environment(monkeypatch):
     assert config["deep_think_provider"] == "anthropic"
     assert config["quick_think_backend_url"] == "http://localhost:8000/v1"
     assert config["quick_think_provider"] is None
+
+
+def test_reasoning_effort_is_separate_for_each_tier_and_falls_back(monkeypatch):
+    made = _captured(monkeypatch)
+    cfg = _config(quick_think_llm="gpt-6.1-sol", deep_think_llm="gpt-6.1-sol",
+                  quick_think_reasoning_effort="high", deep_think_reasoning_effort="max")
+    factory.create_tier_client(cfg, "quick")
+    factory.create_tier_client(cfg, "deep")
+    assert [row[3]["reasoning_effort"] for row in made] == ["high", "max"]
+    cfg["deep_think_reasoning_effort"] = None
+    factory.create_tier_client(cfg, "deep")
+    assert made[-1][3]["reasoning_effort"] == "low"
+
+
+def test_tier_effort_environment_overrides(monkeypatch):
+    monkeypatch.setenv("TRADINGAGENTS_QUICK_THINK_REASONING_EFFORT", "high")
+    monkeypatch.setenv("TRADINGAGENTS_DEEP_THINK_REASONING_EFFORT", "max")
+    cfg = default_config.build_default_config()
+    assert cfg["quick_think_reasoning_effort"] == "high"
+    assert cfg["deep_think_reasoning_effort"] == "max"
+
+
+def test_real_subscription_payload_carries_the_selected_effort_without_requests(monkeypatch):
+    from langchain_core.messages import HumanMessage
+
+    from tradingagents.llm_clients import chatgpt_auth
+    from tradingagents.watchlist.config import load_config
+
+    monkeypatch.setattr(chatgpt_auth, "credential", lambda: lambda: "fixture-token")
+    cfg = load_config("config/redteam.yaml")
+    for tier, expected in [("quick", "high"), ("deep", "max")]:
+        llm = factory.create_tier_client(cfg, tier).get_llm()
+        assert llm.model_name == "gpt-6.1-sol"
+        payload = llm._get_request_payload([HumanMessage("fixture")])
+        assert payload["reasoning"]["effort"] == expected
+
+
+def test_report_settings_include_the_effective_tier_efforts():
+    from tradingagents.graph.trading_graph import TradingAgentsGraph
+    from tradingagents.reporting import _header
+
+    graph = object.__new__(TradingAgentsGraph)
+    graph.selected_analysts = ("market",)
+    graph.config = _config(quick_think_reasoning_effort="high", deep_think_reasoning_effort="max")
+    settings = graph.run_settings()
+    assert settings["deep_think_reasoning_effort"] == "max"
+    assert settings["quick_think_reasoning_effort"] == "high"
+    assert "Reasoning effort: deep max, quick high" in _header("NVDA", {}, settings)
+
+
+def test_unset_tier_overrides_preserve_existing_checkpoint_signature():
+    from tradingagents.graph.trading_graph import TradingAgentsGraph
+
+    graph = object.__new__(TradingAgentsGraph)
+    graph.selected_analysts = ("market",)
+    graph.config = _config(quick_think_reasoning_effort=None, deep_think_reasoning_effort=None)
+    before = graph._run_signature("stock")
+    graph.config.pop("quick_think_reasoning_effort")
+    graph.config.pop("deep_think_reasoning_effort")
+    assert graph._run_signature("stock") == before
+    graph.config["deep_think_reasoning_effort"] = "max"
+    assert graph._run_signature("stock") != before

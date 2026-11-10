@@ -62,6 +62,44 @@ def test_a_run_without_a_sign_in_stops_before_any_request(monkeypatch, tmp_path)
         _llm()
 
 
+def test_plan_limit_is_normalized_without_changing_other_api_errors(signed_in):
+    import httpx
+    from openai import APIError
+
+    from tradingagents.llm_clients.openai_client import NormalizedChatOpenAI
+    from tradingagents.llm_clients.plan_errors import ChatGPTSubscriptionLimitError
+
+    llm = _llm()
+    request = httpx.Request("POST", "https://api.openai.com/v1/responses")
+    limit = APIError("The ChatGPT user has reached their Subscription Sharing usage limit.",
+                     request=request, body=None)
+    with (mock.patch.object(NormalizedChatOpenAI, "invoke", side_effect=limit),
+          pytest.raises(ChatGPTSubscriptionLimitError)):
+        llm.invoke("fixture")
+    other = APIError("unrelated failure", request=request, body=None)
+    with mock.patch.object(NormalizedChatOpenAI, "invoke", side_effect=other):
+        with pytest.raises(APIError) as caught:
+            llm.invoke("fixture")
+        assert caught.value is other
+
+
+def test_async_plan_limit_is_also_normalized(signed_in):
+    import asyncio
+
+    import httpx
+    from openai import APIError
+
+    from tradingagents.llm_clients.openai_client import NormalizedChatOpenAI
+    from tradingagents.llm_clients.plan_errors import ChatGPTSubscriptionLimitError
+
+    limit = APIError("The ChatGPT user has reached their Subscription Sharing usage limit.",
+                     request=httpx.Request("POST", "https://api.openai.com/v1/responses"), body=None)
+    llm = _llm()
+    with (mock.patch.object(NormalizedChatOpenAI, "ainvoke", new=mock.AsyncMock(side_effect=limit)),
+          pytest.raises(ChatGPTSubscriptionLimitError)):
+        asyncio.run(llm.ainvoke("fixture"))
+
+
 @pytest.mark.unit
 def test_a_chatgpt_tier_beside_an_openai_tier_keeps_each_credential(signed_in, monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "sk-openai")

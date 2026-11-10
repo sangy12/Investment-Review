@@ -1,0 +1,507 @@
+{
+  "generated_at": "2026-11-08T10:10:08.567860+00:00",
+  "scope": "Read-only public retrieval; not full report/entitlement/point-in-time acceptance",
+  "probe": {
+    "generated_at": "2026-11-08T10:08:24.432881+00:00",
+    "network": [
+      {
+        "name": "openai_auth",
+        "url": "https://auth.openai.com/.well-known/jwks.json",
+        "data_accepted": false,
+        "http_status": 200,
+        "status": "reachable"
+      },
+      {
+        "name": "openai_models",
+        "url": "https://api.openai.com/v1/models",
+        "data_accepted": false,
+        "http_status": 401,
+        "status": "authentication_required"
+      },
+      {
+        "name": "yahoo_nvda",
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/NVDA?range=5d&interval=1d",
+        "data_accepted": false,
+        "http_status": 429,
+        "status": "reachable_http_error"
+      },
+      {
+        "name": "yahoo_maotai",
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/600519.SS?range=5d&interval=1d",
+        "data_accepted": false,
+        "http_status": 429,
+        "status": "reachable_http_error"
+      },
+      {
+        "name": "yahoo_tencent",
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/0700.HK?range=5d&interval=1d",
+        "data_accepted": false,
+        "http_status": 429,
+        "status": "reachable_http_error"
+      },
+      {
+        "name": "akshare_a_origin",
+        "url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/Index",
+        "data_accepted": false,
+        "http_status": 200,
+        "status": "reachable"
+      },
+      {
+        "name": "akshare_hk_origin",
+        "url": "https://datacenter.eastmoney.com/securities/api/data/v1/get",
+        "data_accepted": false,
+        "http_status": 200,
+        "status": "reachable"
+      },
+      {
+        "name": "futu_news",
+        "url": "https://ai-news-search.futunn.com/news_search?keyword=Tencent&size=3&news_type=1&lang=zh-CN&sort_type=2",
+        "data_accepted": false,
+        "http_status": 200,
+        "status": "reachable"
+      },
+      {
+        "name": "ifind_portal",
+        "url": "https://mcp.51ifind.com/",
+        "data_accepted": false,
+        "http_status": 200,
+        "status": "reachable"
+      },
+      {
+        "name": "miaoxiang_mcp",
+        "url": "https://mxapi.eastmoney.com/mxds/mcp",
+        "data_accepted": false,
+        "http_status": 403,
+        "status": "forbidden"
+      }
+    ],
+    "data": [
+      {
+        "name": "yahoo_nvda",
+        "status": "data_available",
+        "data_accepted": true,
+        "rows": 7,
+        "latest_date": "2026-11-06",
+        "client": "production yfinance adapter",
+        "note": "Price retrieval only; currency and fundamentals require separate verification."
+      },
+      {
+        "name": "yahoo_maotai",
+        "status": "data_available",
+        "data_accepted": true,
+        "rows": 7,
+        "latest_date": "2026-11-06",
+        "client": "production yfinance adapter",
+        "note": "Price retrieval only; currency and fundamentals require separate verification."
+      },
+      {
+        "name": "yahoo_tencent",
+        "status": "data_available",
+        "data_accepted": true,
+        "rows": 7,
+        "latest_date": "2026-11-06",
+        "client": "production yfinance adapter",
+        "note": "Price retrieval only; currency and fundamentals require separate verification."
+      },
+      {
+        "name": "akshare_maotai",
+        "status": "data_available",
+        "data_accepted": true,
+        "rows": 4,
+        "statement": "income",
+        "report_dates": [
+          "2026-09-30",
+          "2026-06-30",
+          "2026-03-31",
+          "2025-12-31"
+        ],
+        "currency_metadata": {
+          "CURRENCY": [
+            "CNY"
+          ]
+        },
+        "unit_metadata": {},
+        "note": "Current retrieval only; absent currency/units are UNKNOWN. Reporting periods are not verified standalone quarters or as-filed history."
+      },
+      {
+        "name": "akshare_tencent",
+        "status": "data_available",
+        "data_accepted": true,
+        "rows": 108,
+        "statement": "income",
+        "report_dates": [
+          "2026-06-30",
+          "2026-03-31",
+          "2025-12-31",
+          "2025-09-30"
+        ],
+        "currency_metadata": {},
+        "unit_metadata": {},
+        "note": "Current retrieval only; absent currency/units are UNKNOWN. Reporting periods are not verified standalone quarters or as-filed history."
+      },
+      {
+        "name": "akshare_maotai_balance",
+        "status": "data_available",
+        "data_accepted": true,
+        "rows": 4,
+        "statement": "balance",
+        "report_dates": [
+          "2026-09-30",
+          "2026-06-30",
+          "2026-03-31",
+          "2025-12-31"
+        ],
+        "currency_metadata": {
+          "CURRENCY": [
+            "CNY"
+          ]
+        },
+        "unit_metadata": {},
+        "note": "Current retrieval only; absent currency/units are UNKNOWN. Reporting periods are not verified standalone quarters or as-filed history."
+      },
+      {
+        "name": "akshare_maotai_cashflow",
+        "status": "data_available",
+        "data_accepted": true,
+        "rows": 4,
+        "statement": "cashflow",
+        "report_dates": [
+          "2026-09-30",
+          "2026-06-30",
+          "2026-03-31",
+          "2025-12-31"
+        ],
+        "currency_metadata": {
+          "CURRENCY": [
+            "CNY"
+          ]
+        },
+        "unit_metadata": {},
+        "note": "Current retrieval only; absent currency/units are UNKNOWN. Reporting periods are not verified standalone quarters or as-filed history."
+      },
+      {
+        "name": "akshare_tencent_balance",
+        "status": "data_available",
+        "data_accepted": true,
+        "rows": 220,
+        "statement": "balance",
+        "report_dates": [
+          "2026-06-30",
+          "2026-03-31",
+          "2025-12-31",
+          "2025-09-30"
+        ],
+        "currency_metadata": {},
+        "unit_metadata": {},
+        "note": "Current retrieval only; absent currency/units are UNKNOWN. Reporting periods are not verified standalone quarters or as-filed history."
+      },
+      {
+        "name": "akshare_tencent_cashflow",
+        "status": "data_available",
+        "data_accepted": true,
+        "rows": 99,
+        "statement": "cashflow",
+        "report_dates": [
+          "2026-06-30",
+          "2026-03-31",
+          "2025-12-31",
+          "2025-09-30"
+        ],
+        "currency_metadata": {},
+        "unit_metadata": {},
+        "note": "Current retrieval only; absent currency/units are UNKNOWN. Reporting periods are not verified standalone quarters or as-filed history."
+      },
+      {
+        "name": "futu_tencent_news",
+        "status": "data_available",
+        "data_accepted": true,
+        "verified_rows": 3,
+        "items": [
+          {
+            "title": "成交额TOP20 | SpaceX大涨9%，马斯克放话Q4营收大增70%、\"不靠政府\"；甲骨文连丢微软、腾讯大合同；英伟达推台积电布局3D DRAM",
+            "published_at_utc": "2026-11-06T22:56:29+00:00",
+            "url": "https://news.futunn.com/post/1003763243?futusource=news_search_searchnews&src=39"
+          },
+          {
+            "title": "TVB与腾讯视频达成战略合作 多部经典IP将改编为横屏短剧",
+            "published_at_utc": "2026-11-06T12:25:46+00:00",
+            "url": "https://news.futunn.com/post/1003722689?futusource=news_search_searchnews&src=39"
+          },
+          {
+            "title": "传甲骨文终止70亿美元算力合作，腾讯暂无回应",
+            "published_at_utc": "2026-11-06T10:43:21+00:00",
+            "url": "https://news.futunn.com/post/1003711698?futusource=news_search_searchnews&src=39"
+          }
+        ],
+        "note": "Public keyword results; issuer identity and original full text unverified. No guaranteed free quota or historical coverage."
+      },
+      {
+        "name": "futu_tencent_notice",
+        "status": "data_available",
+        "data_accepted": true,
+        "verified_rows": 3,
+        "items": [
+          {
+            "title": "哔哩哔哩-W：完成腾讯票据认购事项及同步腾讯购回",
+            "published_at_utc": "2026-11-06T04:01:27+00:00",
+            "url": "https://news.futunn.com/notice/1003660710?futusource=news_search_searchnews&src=39"
+          },
+          {
+            "title": "Mynet：腾讯全球年度旗舰活动“腾讯全球数字生态峰会（GDES）2026”上，迈网执行董事兼首席技术官堀越裕树将登台发言。",
+            "published_at_utc": "2026-10-26T03:00:00+00:00",
+            "url": "https://news.futunn.com/notice/1002245187?futusource=news_search_searchnews&src=39"
+          },
+          {
+            "title": "根据<em>腾讯控股</em>有限公司最高限额为300亿美元之全球中期票据计划发行将于二零三六年到期的1,300,000,000美元6.10%优先票据及将于二零四六年到期的500,000,000美元6.75%优先票据及将于二零三六年到期的人民币20,000,000,000元2.40%优先票据及将于二零五六年到期的人民币6,000,000,000元3.00%优先票据刊发定价补充文件",
+            "published_at_utc": "2026-10-22T04:03:29+00:00",
+            "url": "https://news.futunn.com/notice/1001898515?futusource=news_search_searchnews&src=39"
+          }
+        ],
+        "note": "Public keyword results; issuer identity and original full text unverified. No guaranteed free quota or historical coverage."
+      },
+      {
+        "name": "futu_tencent_research",
+        "status": "data_available",
+        "data_accepted": true,
+        "verified_rows": 3,
+        "items": [
+          {
+            "title": "里昂：下调<em>腾讯控股</em>(00700)目标价至685港元 维持“高确信跑赢大市”评级",
+            "published_at_utc": "2026-11-06T06:32:06+00:00",
+            "url": "https://news.futunn.com/post/1003677838?futusource=news_search_searchnews&src=39"
+          },
+          {
+            "title": "中金：维持<em>腾讯控股</em>(00700)“跑赢行业”评级 目标价666港元",
+            "published_at_utc": "2026-11-05T01:42:27+00:00",
+            "url": "https://news.futunn.com/post/1003481671?futusource=news_search_searchnews&src=39"
+          },
+          {
+            "title": "<em>腾讯控股</em>(00700.HK)：AI应用速评(4)：Hy4补齐视觉 强化生产力场景任务优势",
+            "published_at_utc": "2026-11-04T11:46:00+00:00",
+            "url": "https://news.futunn.com/post/1003403193?futusource=news_search_searchnews&src=39"
+          }
+        ],
+        "note": "Public keyword results; issuer identity and original full text unverified. No guaranteed free quota or historical coverage."
+      },
+      {
+        "name": "historical_guard_600519.SS",
+        "status": "safety_guard_passed",
+        "data_accepted": false,
+        "note": "Guard check only; not a live financial-data pass."
+      },
+      {
+        "name": "historical_guard_0700.HK",
+        "status": "safety_guard_passed",
+        "data_accepted": false,
+        "note": "Guard check only; not a live financial-data pass."
+      }
+    ],
+    "public_data_passed": true,
+    "auth": {
+      "credentials_present": false,
+      "sec_user_agent_configured": false
+    },
+    "pending": [
+      "iFinD/Miaoxiang authenticated tools/list and per-field tests",
+      "Futu quote OAuth scopes and available data rights",
+      "No pricing/free-quota claim has been verified by these probes."
+    ]
+  },
+  "nvda_financials": {
+    "generated_at": "2026-11-08T10:08:49.315498+00:00",
+    "ticker": "NVDA",
+    "source": "production Yahoo financial adapter",
+    "results": [
+      {
+        "method": "get_income_statement",
+        "status": "data_available",
+        "line_items": 42,
+        "periods": [
+          "2026-07-31",
+          "2026-04-30",
+          "2026-01-31",
+          "2025-10-31",
+          "2025-07-31"
+        ],
+        "numeric_cells": 201
+      },
+      {
+        "method": "get_balance_sheet",
+        "status": "data_available",
+        "line_items": 78,
+        "periods": [
+          "2026-07-31",
+          "2026-04-30",
+          "2026-01-31",
+          "2025-10-31",
+          "2025-07-31",
+          "2025-04-30"
+        ],
+        "numeric_cells": 350
+      },
+      {
+        "method": "get_cashflow",
+        "status": "data_available",
+        "line_items": 49,
+        "periods": [
+          "2026-07-31",
+          "2026-04-30",
+          "2026-01-31",
+          "2025-10-31",
+          "2025-07-31"
+        ],
+        "numeric_cells": 230
+      }
+    ],
+    "note": "Current quarterly tables only; original disclosures, currency/unit metadata and as-filed history not verified. SEC primary-source calls pending a real SEC_EDGAR_USER_AGENT."
+  },
+  "maotai_origin_diagnostic": {
+    "generated_at": "2026-11-08T10:08:12.857751+00:00",
+    "source": "East Money endpoints used by AKShare 1.20.35; direct latest-four-period diagnostic",
+    "results": [
+      {
+        "statement": "income",
+        "status": "data_available",
+        "rows": 4,
+        "samples": [
+          {
+            "REPORT_DATE": "2026-09-30 00:00:00",
+            "REPORT_DATE_NAME": "2026三季报",
+            "REPORT_TYPE": "三季报",
+            "NOTICE_DATE": "2026-10-31 00:00:00",
+            "CURRENCY": "CNY",
+            "OPERATE_INCOME": 130970743649.04
+          },
+          {
+            "REPORT_DATE": "2026-06-30 00:00:00",
+            "REPORT_DATE_NAME": "2026中报",
+            "REPORT_TYPE": "中报",
+            "NOTICE_DATE": "2026-08-15 00:00:00",
+            "CURRENCY": "CNY",
+            "OPERATE_INCOME": 90703260964.48
+          },
+          {
+            "REPORT_DATE": "2026-03-31 00:00:00",
+            "REPORT_DATE_NAME": "2026一季报",
+            "REPORT_TYPE": "一季报",
+            "NOTICE_DATE": "2026-04-25 00:00:00",
+            "CURRENCY": "CNY",
+            "OPERATE_INCOME": 53909252220.51
+          },
+          {
+            "REPORT_DATE": "2025-12-31 00:00:00",
+            "REPORT_DATE_NAME": "2025年报",
+            "REPORT_TYPE": "年报",
+            "NOTICE_DATE": "2026-04-17 00:00:00",
+            "CURRENCY": "CNY",
+            "OPERATE_INCOME": 168838102514.79
+          }
+        ],
+        "unit": "UNKNOWN: absent from this response",
+        "request_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/lrbAjaxNew?companyType=4&reportDateType=0&code=SH600519&reportType=1&dates=2026-09-30%2C2026-06-30%2C2026-03-31%2C2025-12-31"
+      },
+      {
+        "statement": "balance",
+        "status": "data_available",
+        "rows": 4,
+        "samples": [
+          {
+            "REPORT_DATE": "2026-09-30 00:00:00",
+            "REPORT_DATE_NAME": "2026三季报",
+            "REPORT_TYPE": "三季报",
+            "NOTICE_DATE": "2026-10-31 00:00:00",
+            "CURRENCY": "CNY",
+            "TOTAL_ASSETS": 318304891882.72
+          },
+          {
+            "REPORT_DATE": "2026-06-30 00:00:00",
+            "REPORT_DATE_NAME": "2026中报",
+            "REPORT_TYPE": "中报",
+            "NOTICE_DATE": "2026-08-15 00:00:00",
+            "CURRENCY": "CNY",
+            "TOTAL_ASSETS": 309050784569.31
+          },
+          {
+            "REPORT_DATE": "2026-03-31 00:00:00",
+            "REPORT_DATE_NAME": "2026一季报",
+            "REPORT_TYPE": "一季报",
+            "NOTICE_DATE": "2026-04-25 00:00:00",
+            "CURRENCY": "CNY",
+            "TOTAL_ASSETS": 319918844905.58
+          },
+          {
+            "REPORT_DATE": "2025-12-31 00:00:00",
+            "REPORT_DATE_NAME": "2025年报",
+            "REPORT_TYPE": "年报",
+            "NOTICE_DATE": "2026-04-17 00:00:00",
+            "CURRENCY": "CNY",
+            "TOTAL_ASSETS": 303834844021.44
+          }
+        ],
+        "unit": "UNKNOWN: absent from this response",
+        "request_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/zcfzbAjaxNew?companyType=4&reportDateType=0&code=SH600519&reportType=1&dates=2026-09-30%2C2026-06-30%2C2026-03-31%2C2025-12-31"
+      },
+      {
+        "statement": "cashflow",
+        "status": "data_available",
+        "rows": 4,
+        "samples": [
+          {
+            "REPORT_DATE": "2026-09-30 00:00:00",
+            "REPORT_DATE_NAME": "2026三季报",
+            "REPORT_TYPE": "三季报",
+            "NOTICE_DATE": "2026-10-31 00:00:00",
+            "CURRENCY": "CNY",
+            "NETCASH_OPERATE": 84058979832.29
+          },
+          {
+            "REPORT_DATE": "2026-06-30 00:00:00",
+            "REPORT_DATE_NAME": "2026中报",
+            "REPORT_TYPE": "中报",
+            "NOTICE_DATE": "2026-08-15 00:00:00",
+            "CURRENCY": "CNY",
+            "NETCASH_OPERATE": 70690750119.06
+          },
+          {
+            "REPORT_DATE": "2026-03-31 00:00:00",
+            "REPORT_DATE_NAME": "2026一季报",
+            "REPORT_TYPE": "一季报",
+            "NOTICE_DATE": "2026-04-25 00:00:00",
+            "CURRENCY": "CNY",
+            "NETCASH_OPERATE": 26909891269.13
+          },
+          {
+            "REPORT_DATE": "2025-12-31 00:00:00",
+            "REPORT_DATE_NAME": "2025年报",
+            "REPORT_TYPE": "年报",
+            "NOTICE_DATE": "2026-04-17 00:00:00",
+            "CURRENCY": "CNY",
+            "NETCASH_OPERATE": 61522204989.35
+          }
+        ],
+        "unit": "UNKNOWN: absent from this response",
+        "request_url": "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/xjllbAjaxNew?companyType=4&reportDateType=0&code=SH600519&reportType=1&dates=2026-09-30%2C2026-06-30%2C2026-03-31%2C2025-12-31"
+      }
+    ],
+    "note": "Separate diagnostic, does not override production adapter timeout; units, cumulative basis and original disclosure documents require verification."
+  },
+  "authenticated_services": {
+    "chatgpt": "not_signed_in; models command failed before fetching plan models",
+    "sec_edgar": "not_tested; real SEC_EDGAR_USER_AGENT is not configured",
+    "ifind": "public portal reachable; no authenticated tools/list or quota verification",
+    "miaoxiang": "HTTP 403 JSON says 密钥不存在，请提供; no authenticated tools/list or quota verification"
+  },
+  "browser": {
+    "official_oauth_page": "ERR_CONNECTION_REFUSED in shared Chromium",
+    "command_line_auth_service": "JWKS HTTP 200; official authorize endpoint responds",
+    "handoff": "User completes OAuth in their own browser and pastes callback only into the trusted cloud terminal."
+  },
+  "checks": {
+    "pytest": "47 passed",
+    "ruff": "passed"
+  },
+  "safety": {
+    "trading_interfaces_connected": false,
+    "credentials_included": false
+  }
+}

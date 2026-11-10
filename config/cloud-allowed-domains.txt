@@ -16,6 +16,10 @@ push2.eastmoney.com
 search-api-web.eastmoney.com
 np-weblist.eastmoney.com
 ai-news-search.futunn.com
+fred.stlouisfed.org
+api.stlouisfed.org
+basic.10jqka.com.cn
+www.etnet.com.hk
 mcp.51ifind.com
 api-mcp.51ifind.com
 choice.eastmoney.com

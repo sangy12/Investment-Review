@@ -86,9 +86,10 @@ def load_config(path):
 def market_config(cfg, position):
     cfg = deepcopy(cfg)
     if position["market"] in ("A_SHARE", "HK"):
-        # Explicit opt-in, pending comparison with the user's other data sources.
         china = cfg.pop("china_data_vendors", {})
         cfg["data_vendors"].update(china)
+        cfg.setdefault("tool_vendors", {}).update(cfg.pop("china_tool_vendors", {}))
     else:
         cfg.pop("china_data_vendors", None)
+        cfg.pop("china_tool_vendors", None)
     return cfg

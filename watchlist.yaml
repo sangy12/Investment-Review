@@ -1,4 +1,4 @@
-updated: 2026-11-08
+updated: 2026-11-10
 positions:
   - ticker: NVDA
     name: NVIDIA
@@ -10,5 +10,9 @@ positions:
     thesis: ""
   - ticker: 0700.HK
     name: 腾讯控股
+    market: HK
+    thesis: ""
+  - ticker: 0100.HK
+    name: MiniMax
     market: HK
     thesis: ""

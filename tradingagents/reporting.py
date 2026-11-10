@@ -35,6 +35,9 @@ def _header(ticker: str, final_state: dict, settings: dict | None) -> str:
             models = (f"deep {deep_provider} {s('deep_think_llm', '?')}, "
                       f"quick {quick_provider} {s('quick_think_llm', '?')}")
         lines.append(f"- TradingAgents {s('version', '?')}: {models}")
+        if s("deep_think_reasoning_effort") or s("quick_think_reasoning_effort"):
+            lines.append(f"- Reasoning effort: deep {s('deep_think_reasoning_effort') or 'provider default'}, "
+                         f"quick {s('quick_think_reasoning_effort') or 'provider default'}")
         lines.append(f"- Analysts: {', '.join(analyst_names(s('analysts')))}; "
                      f"research debate rounds {s('max_debate_rounds', '?')}, "
                      f"risk debate rounds {s('max_risk_discuss_rounds', '?')}")

@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-11-08T14:22:47.497691+00:00",
+  "anonymous_endpoint_probe": {
+    "generated_at": "2026-11-08T14:16:04.545537+00:00",
+    "probe": "anonymous tools/list at official URLs; no tools/call",
+    "results": [
+      {
+        "provider": "ifind-stock",
+        "url": "https://api-mcp.51ifind.com:8643/ds-mcp-servers/hexin-ifind-ds-stock-mcp",
+        "http_status": 401,
+        "status": "authentication_or_permission_required",
+        "credential_sent": false,
+        "data_accepted": false
+      },
+      {
+        "provider": "ifind-global",
+        "url": "https://api-mcp.51ifind.com:8643/ds-mcp-servers/hexin-ifind-ds-global-stock-mcp",
+        "http_status": 401,
+        "status": "authentication_or_permission_required",
+        "credential_sent": false,
+        "data_accepted": false
+      },
+      {
+        "provider": "ifind-edb",
+        "url": "https://api-mcp.51ifind.com:8643/ds-mcp-servers/hexin-ifind-ds-edb-mcp",
+        "http_status": 401,
+        "status": "authentication_or_permission_required",
+        "credential_sent": false,
+        "data_accepted": false
+      },
+      {
+        "provider": "miaoxiang",
+        "url": "https://mxapi.eastmoney.com/mxds/mcp",
+        "http_status": 403,
+        "status": "authentication_or_permission_required",
+        "credential_sent": false,
+        "data_accepted": false
+      }
+    ]
+  },
+  "configured_inventory_probe": {
+    "generated_at": "2026-11-08T14:19:47.978912+00:00",
+    "providers": [
+      {
+        "provider": "ifind-stock",
+        "url": "https://api-mcp.51ifind.com:8643/ds-mcp-servers/hexin-ifind-ds-stock-mcp",
+        "credential_variable": "IFIND_MCP_AUTHORIZATION",
+        "data_accepted": false,
+        "tools_called": 0,
+        "quota_verified": false,
+        "credential_present": false,
+        "status": "missing_credential"
+      },
+      {
+        "provider": "ifind-global",
+        "url": "https://api-mcp.51ifind.com:8643/ds-mcp-servers/hexin-ifind-ds-global-stock-mcp",
+        "credential_variable": "IFIND_MCP_AUTHORIZATION",
+        "data_accepted": false,
+        "tools_called": 0,
+        "quota_verified": false,
+        "credential_present": false,
+        "status": "missing_credential"
+      },
+      {
+        "provider": "ifind-edb",
+        "url": "https://api-mcp.51ifind.com:8643/ds-mcp-servers/hexin-ifind-ds-edb-mcp",
+        "credential_variable": "IFIND_MCP_AUTHORIZATION",
+        "data_accepted": false,
+        "tools_called": 0,
+        "quota_verified": false,
+        "credential_present": false,
+        "status": "missing_credential"
+      },
+      {
+        "provider": "ifind-news",
+        "url": "https://api-mcp.51ifind.com:8643/ds-mcp-servers/hexin-ifind-ds-news-mcp",
+        "credential_variable": "IFIND_MCP_AUTHORIZATION",
+        "data_accepted": false,
+        "tools_called": 0,
+        "quota_verified": false,
+        "credential_present": false,
+        "status": "missing_credential"
+      },
+      {
+        "provider": "miaoxiang",
+        "url": "https://mxapi.eastmoney.com/mxds/mcp",
+        "credential_variable": "EM_API_KEY",
+        "data_accepted": false,
+        "tools_called": 0,
+        "quota_verified": false,
+        "credential_present": false,
+        "status": "missing_credential"
+      }
+    ],
+    "note": "Discovery only; no tools/call, no quota/free-entitlement claim, no tools exposed to agents."
+  },
+  "official_configuration_evidence": {
+    "ifind_portal": "https://mcp.51ifind.com/",
+    "ifind_public_config_generator": "https://s.thsi.cn/cd/ifind-java-ds-bff-web-container/ifind-mcp-web/assets/index-CbxRhxcP.js",
+    "ifind_authorization": "Use exact Authorization value from official export; no automatic prefix",
+    "ifind_global_service": "hexin-ifind-ds-global-stock-mcp",
+    "miaoxiang_doc": "https://mxapi.eastmoney.com/mxds/doc/mcp-install.md",
+    "miaoxiang_auth_header": "em_api_key"
+  },
+  "scope": "Metadata discovery only; no tools/call, no account/trading APIs connected, no purchase, no credential values."
+}

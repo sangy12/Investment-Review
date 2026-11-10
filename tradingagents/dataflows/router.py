@@ -19,6 +19,7 @@ from tradingagents.dataflows.vendors.alpha_vantage import (
     get_stock as get_alpha_vantage_stock,
 )
 from tradingagents.dataflows.vendors.fred import get_macro_data as get_fred_macro_data
+from tradingagents.dataflows.vendors.fred_public import get_macro_data as get_fred_public_macro_data
 from tradingagents.dataflows.vendors.polymarket import (
     get_prediction_markets as get_polymarket_prediction_markets,
 )
@@ -142,6 +143,7 @@ VENDOR_METHODS = {
     # macro_data
     "get_macro_indicators": {
         "fred": get_fred_macro_data,
+        "fred_public": get_fred_public_macro_data,
     },
     # prediction_markets
     "get_prediction_markets": {
@@ -243,11 +245,20 @@ def route_to_vendor(method: str, *args, **kwargs):
     failed: Exception | None = None     # a vendor that raised something untyped
     first_error: Exception | None = None
     for vendor in vendor_chain:
+        if method == "get_macro_indicators" and vendor == "akshare":
+            indicator = args[0] if args else kwargs.get("indicator")
+            if indicator not in {"china_cpi", "china_gdp", "china_lpr"}:
+                if len(vendor_chain) == 1:
+                    return "DATA_UNAVAILABLE: AKShare macro routing requires explicit china_cpi, china_gdp or china_lpr; no US substitution."
+                continue  # Bare cpi/gdp retain their original US meanings.
         vendor_impl = VENDOR_METHODS[method][vendor]
         impl_func = vendor_impl[0] if isinstance(vendor_impl, list) else vendor_impl
 
         try:
-            return impl_func(*args, **kwargs)
+            result = impl_func(*args, **kwargs)
+            if method == "get_news" and vendor == "yfinance" and "akshare" in vendor_chain and isinstance(result, str) and result.startswith("<") and "unavailable for" in result:
+                raise VendorUnavailableError("Yahoo news does not cover the requested window")
+            return result
         except VendorUnavailableError as e:
             logger.warning("Vendor %r unavailable for %s: %s; trying next vendor.", vendor, method, e)
             # Kept so an all-unavailable chain can say the vendor was the

@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from typing import Annotated
 
 import yfinance as yf
@@ -101,7 +102,19 @@ def get_fundamentals(
     if not lines:
         raise_for_empty(ticker, canonical, "fundamental fields")
 
-    return f"# Company Fundamentals for {canonical}\n\n" + "\n".join(lines)
+    quote_time = info.get("regularMarketTime")
+    try:
+        quote_time = datetime.fromtimestamp(float(quote_time), UTC).isoformat() if quote_time else "UNKNOWN"
+    except (ValueError, TypeError, OverflowError, OSError):
+        quote_time = "UNKNOWN"
+    provenance = ["Source: Yahoo Finance (vendor snapshot, not issuer verification)",
+                  f"Retrieved at (UTC): {datetime.now(UTC).isoformat()}",
+                  f"Regular market quote timestamp (UTC): {quote_time}",
+                  f"Regular market price: {money('regularMarketPrice', quote) if info.get('regularMarketPrice') is not None else 'UNKNOWN'}",
+                  f"Financial currency: {reported or 'UNKNOWN'}",
+                  "Forward valuation estimate formation time, analyst coverage and consensus methodology: UNKNOWN",
+                  "Quote timestamp applies to the quote only, not all valuation or financial fields."]
+    return f"# Company Fundamentals for {canonical}\n\n" + "\n".join(provenance + lines)
 
 
 def _statement(ticker, freq, as_of_date, title, quarterly_attr, annual_attr) -> str:

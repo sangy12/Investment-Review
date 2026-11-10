@@ -1,0 +1,131 @@
+{
+  "as_of": "2026-11-10",
+  "paid_mcp_calls": 0,
+  "model_calls": 0,
+  "checks": [
+    {
+      "ticker": "NVDA",
+      "items": 2,
+      "kinds": [
+        "consensus_snapshot",
+        "consensus_snapshot"
+      ],
+      "tables": [
+        {
+          "source": "Yahoo Finance",
+          "rows": 4,
+          "columns": [
+            "forecast_period",
+            "avg",
+            "low",
+            "high",
+            "yearAgoEps",
+            "numberOfAnalysts",
+            "growth",
+            "currency",
+            "methodology"
+          ]
+        },
+        {
+          "source": "Yahoo Finance",
+          "rows": 4,
+          "columns": [
+            "forecast_period",
+            "avg",
+            "low",
+            "high",
+            "numberOfAnalysts",
+            "yearAgoRevenue",
+            "growth",
+            "currency"
+          ]
+        }
+      ],
+      "community_posts": 0,
+      "gaps": []
+    },
+    {
+      "ticker": "600519.SS",
+      "items": 2,
+      "kinds": [
+        "consensus_snapshot",
+        "consensus_snapshot"
+      ],
+      "tables": [
+        {
+          "source": "AKShare / THS",
+          "rows": 3,
+          "columns": [
+            "年度",
+            "预测机构数",
+            "最小值",
+            "均值",
+            "最大值",
+            "行业平均数"
+          ]
+        },
+        {
+          "source": "AKShare / THS",
+          "rows": 3,
+          "columns": [
+            "年度",
+            "预测机构数",
+            "最小值",
+            "均值",
+            "最大值",
+            "行业平均数"
+          ]
+        }
+      ],
+      "community_posts": 0,
+      "gaps": []
+    },
+    {
+      "ticker": "0700.HK",
+      "items": 6,
+      "kinds": [
+        "consensus_snapshot",
+        "community_post",
+        "community_post",
+        "community_post",
+        "community_post",
+        "community_post"
+      ],
+      "tables": [
+        {
+          "source": "AKShare / ETNet",
+          "rows": 3,
+          "columns": [
+            "财政年度",
+            "纯利/亏损",
+            "每股盈利/每股亏损",
+            "每股派息",
+            "每股资产净值",
+            "最高",
+            "最低"
+          ]
+        }
+      ],
+      "community_posts": 5,
+      "gaps": []
+    },
+    {
+      "indicator": "cpi",
+      "source_fred_public": true,
+      "rows": 16,
+      "unavailable": false
+    },
+    {
+      "indicator": "unemployment",
+      "source_fred_public": true,
+      "rows": 17,
+      "unavailable": false
+    },
+    {
+      "indicator": "10y_treasury",
+      "source_fred_public": true,
+      "rows": 46,
+      "unavailable": false
+    }
+  ]
+}

@@ -135,7 +135,9 @@ def _statement(ticker, freq, as_of_date, kind):
     dates = sorted(frame["REPORT_DATE"].dropna().astype(str).unique(), reverse=True)[:4]
     frame = frame[frame["REPORT_DATE"].astype(str).isin(dates)]
     return _csv(frame, f"{ticker} {chinese}; current snapshot {date}; {freq}; "
-                "HK 报告期 may be interim, NOT standalone quarters; "
+                "frequency selects reporting dates, NOT standalone quarters. Balance sheets are point-in-time; "
+                "income/cashflow periods may be year-to-date (HK may be interim). "
+                "Vendor line-item labels require issuer reconciliation: HK 营业额 and 营运收入 may differ. "
                 "use explicit upstream currency/unit fields only; if absent they are UNKNOWN, "
                 "do not assume quote currency or combine amounts with other sources")
 

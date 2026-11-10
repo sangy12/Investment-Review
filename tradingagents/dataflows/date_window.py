@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 from datetime import UTC, date, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 
 def to_utc(dt: datetime) -> datetime:
@@ -34,6 +35,11 @@ def in_window(pub_dt: datetime | None, start_dt: datetime, end_dt: datetime) -> 
 
 def get_current_date() -> str:
     """Today's date, YYYY-MM-DD."""
+    from tradingagents.dataflows.config import get_config
+
+    timezone = get_config().get("analysis_timezone")
+    if timezone:
+        return datetime.now(ZoneInfo(timezone)).date().isoformat()
     return date.today().strftime("%Y-%m-%d")
 
 
@@ -60,7 +66,7 @@ def coverage_gap(
     """
     now = datetime.now(UTC)
     oldest = min((to_utc(d) for d in dates if d is not None), default=now)
-    if datetime.strptime(end_date, "%Y-%m-%d").date() > now.date():
+    if end_date > get_current_date():
         reason = "the window extends past today"
     elif oldest.date() > datetime.strptime(start_date, "%Y-%m-%d").date():
         reason = "it only serves recent items"

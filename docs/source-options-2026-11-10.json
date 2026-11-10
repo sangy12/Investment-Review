@@ -1,0 +1,91 @@
+{
+  "validation_date_shanghai": "2026-11-10",
+  "scope": "Read-only public probes; no Miaoxiang calls, model calls, account login or trading APIs; not production integration",
+  "fred_public_csv": {
+    "source": "FRED public CSV",
+    "http": 200,
+    "content_type": "application/zip",
+    "key_used": false,
+    "series": [
+      {
+        "file": "monthly.csv",
+        "rows": 946,
+        "columns": [
+          "observation_date",
+          "CPIAUCSL",
+          "UNRATE"
+        ],
+        "numeric_cells": 954,
+        "latest_date": "2026-10-01"
+      },
+      {
+        "file": "daily.csv",
+        "rows": 16918,
+        "columns": [
+          "observation_date",
+          "DGS10"
+        ],
+        "numeric_cells": 16197,
+        "latest_date": "2026-11-05"
+      }
+    ]
+  },
+  "other_public_probes": [
+    {
+      "case": "yahoo_NVDA_estimates",
+      "exit_code": 0,
+      "rows": 4,
+      "columns": [
+        "avg",
+        "low",
+        "high",
+        "yearAgoEps",
+        "numberOfAnalysts",
+        "growth",
+        "currency",
+        "methodology"
+      ],
+      "periods": [
+        "0q",
+        "+1q",
+        "0y",
+        "+1y"
+      ]
+    },
+    {
+      "case": "akshare_A_estimates",
+      "exit_code": 0,
+      "rows": 3,
+      "columns": [
+        "年度",
+        "预测机构数",
+        "最小值",
+        "均值",
+        "最大值",
+        "行业平均数"
+      ]
+    },
+    {
+      "case": "akshare_HK_estimates",
+      "exit_code": 0,
+      "rows": 3,
+      "columns": [
+        "财政年度",
+        "纯利/亏损",
+        "每股盈利/每股亏损",
+        "每股派息",
+        "每股资产净值",
+        "最高",
+        "最低"
+      ]
+    },
+    {
+      "case": "futu_community",
+      "exit_code": 0,
+      "http": 200,
+      "code": 0,
+      "data_type": "list",
+      "items": 3
+    }
+  ]
+}

@@ -12,9 +12,13 @@ from markdown_it import MarkdownIt
 
 from tradingagents.agents.rating import run_rating
 from tradingagents.dataflows.files import locked
+from tradingagents.llm_clients.plan_errors import ChatGPTSubscriptionLimitError
 from tradingagents.reporting import write_report_tree
 from tradingagents.watchlist.config import market_config, today, validate_date
+from tradingagents.watchlist.evidence import prepare_evidence, render_evidence
+from tradingagents.watchlist.resume import checkpoint_packet
 from tradingagents.watchlist.review import changes, make_review, summary_markdown, validate_complete
+from tradingagents.watchlist.usage import UsageTracker, usage_context, usage_markdown
 
 
 def atomic_text(path, text):
@@ -70,7 +74,7 @@ def write_index(root, positions, outcomes):
 
 
 def run_batch(positions, cfg, root="reports", date=None, only=None, skip_unchanged=False,
-              graph_factory=None, reviewer=make_review, on_status=print):
+              graph_factory=None, reviewer=make_review, on_status=print, resume_only=False):
     date = validate_date(date or today())
     root = Path(root)
     root.mkdir(parents=True, exist_ok=True)
@@ -83,7 +87,7 @@ def run_batch(positions, cfg, root="reports", date=None, only=None, skip_unchang
     # One batch owns canonical aliases/index; graph's own checkpoint locks still apply.
     with locked(root / ".batch"):
         try:
-            for position in positions:
+            for position_index, position in enumerate(positions):
                 ticker = position["ticker"]
                 if only and ticker != only:
                     continue
@@ -96,6 +100,8 @@ def run_batch(positions, cfg, root="reports", date=None, only=None, skip_unchang
                     continue
                 run_id = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ") + "-" + uuid.uuid4().hex[:8]
                 staging = root / ticker / "runs" / f".pending-{run_id}"
+                usage = UsageTracker(root / ticker / "usage" / f"{run_id}.json")
+                usage_token = usage_context.set(usage)
                 try:
                     on_status(f"{ticker}: 开始完整分析 {date}")
                     if graph_factory is None:
@@ -105,28 +111,59 @@ def run_batch(positions, cfg, root="reports", date=None, only=None, skip_unchang
                     else:
                         factory = graph_factory
                     graph = factory(config=effective)
+                    packet = None
+                    if effective.get("research_sources", {}).get("enabled"):
+                        # Factory verifies subscription/model access before any paid
+                        # data is fetched. Every agent receives this same packet.
+                        packet = checkpoint_packet(graph, position, date) if resume_only else None
+                        if packet is None:
+                            packet = (prepare_evidence(position, date, effective, cached_only=True) if resume_only
+                                      else prepare_evidence(position, date, effective))
+                        effective["shared_research_evidence"] = render_evidence(packet)
+                        graph.config["shared_research_evidence"] = effective["shared_research_evidence"]
+                    checker = getattr(graph, "checkpoint_resume_step", None)
+                    step = checker(ticker, date) if callable(checker) else None
+                    usage.resumed_from_step = step if type(step) is int else None
+                    if resume_only and usage.resumed_from_step is None:
+                        raise ValueError("没有匹配当前配置和材料的断点；未发起模型调用。")
                     state, _ = graph.propagate(ticker, date)
                     # Retain the graph's complete output even if review extraction fails.
                     settings = graph.run_settings()
                     write_report_tree(state, ticker, staging, settings=settings)
+                    if packet is not None:
+                        atomic_text(staging / "research_sources.json", json.dumps(packet, ensure_ascii=False, indent=2))
+                        atomic_text(staging / "research_sources.md", render_evidence(packet))
                     validate_complete(state)
                     previous = prior[-1] if prior else None
+                    usage.phase = "review"
                     review = reviewer(state, position, previous, graph.quick_thinking_llm)
+                    usage.finish("completed")
+                    usage_data = usage.snapshot()
+                    atomic_text(staging / "usage.json", json.dumps(usage_data, ensure_ascii=False, indent=2))
                     snapshot = {"schema_version": 1, "run_id": run_id, "date": date,
                                 "created_at": datetime.now(UTC).isoformat(), "ticker": ticker,
                                 "position": position, "rating": run_rating(state), "review": review,
                                 "fingerprint": signature,
                                 "previous_run_id": previous["run_id"] if previous else None,
-                                "settings": settings}
-                    summary = summary_markdown(snapshot, previous)
+                                "settings": settings, "usage": usage_data}
+                    if packet is not None:
+                        snapshot["source_packet_sha256"] = hashlib.sha256(
+                            render_evidence(packet).encode()).hexdigest()
+                    summary = summary_markdown(snapshot, previous) + "\n" + usage_markdown(usage_data)
                     original = (staging / "complete_report.md").read_text(encoding="utf-8")
                     (staging / "original_report.md").write_text(original, encoding="utf-8")
                     complete = f"# {ticker} · {date}\n\n" + summary + "\n" + original
+                    if packet is not None:
+                        complete += "\n\n" + render_evidence(packet)
                     (staging / "complete_report.md").write_text(complete, encoding="utf-8")
                     html_path = staging / "complete_report.html"
                     html = html_path.read_text(encoding="utf-8")
                     rendered = MarkdownIt("commonmark", {"html": False}).render(summary)
                     html_path.write_text(html.replace("<main>", "<main>\n" + rendered, 1), encoding="utf-8")
+                    if packet is not None:
+                        html = html_path.read_text(encoding="utf-8")
+                        rendered_sources = MarkdownIt("commonmark", {"html": False}).render(render_evidence(packet))
+                        html_path.write_text(html.replace("</main>", rendered_sources + "</main>", 1), encoding="utf-8")
                     (staging / "snapshot.json").write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
                     final = staging.with_name(run_id)
                     staging.rename(final)  # success marker: only committed runs enter history
@@ -139,15 +176,27 @@ def run_batch(positions, cfg, root="reports", date=None, only=None, skip_unchang
                     outcomes[ticker] = "成功"
                     on_status(f"{ticker}: 成功，{root / ticker / (date + '.md')}")
                 except Exception as exc:
+                    usage.finish("failed")
                     # Error strings can contain signed URLs/auth headers: persist only the type.
                     outcomes[ticker] = f"失败：{type(exc).__name__}；已有报告可能较旧"
                     failures.append({"ticker": ticker, "error_type": type(exc).__name__})
+                    if isinstance(exc, ChatGPTSubscriptionLimitError):
+                        failures[-1]["error_code"] = exc.code
+                        outcomes[ticker] = "失败：ChatGPT 订阅共享额度已达上限；保留断点，待额度重置"
                     if staging.exists():
                         failed_path = root / ticker / "failed" / run_id
                         failed_path.parent.mkdir(parents=True, exist_ok=True)
                         staging.rename(failed_path)
                     on_status(f"{ticker}: {outcomes[ticker]}")
+                    if isinstance(exc, ChatGPTSubscriptionLimitError):
+                        for pending in positions[position_index + 1:]:
+                            if not only or pending["ticker"] == only:
+                                outcomes[pending["ticker"]] = "未执行：ChatGPT 订阅共享额度已达上限"
+                        break
                 finally:
+                    if usage.snapshot()["status"] == "running":
+                        usage.finish("interrupted")
+                    usage_context.reset(usage_token)
                     shutil.rmtree(staging, ignore_errors=True)
         finally:
             write_index(root, positions, outcomes)

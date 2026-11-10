@@ -1,0 +1,239 @@
+{
+  "generated_at_shanghai": "2026-11-08T23:03:03.150356+08:00",
+  "authentication_passed": true,
+  "real_data_retrieval_passed": true,
+  "full_fundamental_acceptance_passed": false,
+  "production_default_enabled": false,
+  "inventory": {
+    "tool_count": 11,
+    "tools": [
+      "mx_ashare_finance_data",
+      "mx_bond_finance_data",
+      "mx_comprehensive_finance_data",
+      "mx_finance_search_news",
+      "mx_finance_search_notice",
+      "mx_fund_finance_data",
+      "mx_hk_finance_data",
+      "mx_index_block_finance_data",
+      "mx_macro_data",
+      "mx_stocks_screener",
+      "mx_us_finance_data"
+    ],
+    "quota_query_tool_present": false
+  },
+  "cases": [
+    {
+      "case": "maotai",
+      "tool": "mx_ashare_finance_data",
+      "query": "仅查询贵州茅台（600519.SH）截至2026年11月8日已公开的数据。请查询2026年9月30日及2026年6月30日两期的营业收入（不是营业总收入）、经营活动产生的现金流量净额、期末合同负债，以及直销/批发代理、茅台酒/系列酒的主营业务收入。明确年初至期末累计或单季，保留币种、单位、原始指标名称；给出披露日期及可追溯原文链接。不能取得的字段明确说明不可用，不估算，不用今天的数据冒充历史原始版本。只查询公开研究数据，不涉及账户、持仓或交易。",
+      "status": "response_received",
+      "tools_call_attempts": 1,
+      "elapsed_seconds": 6.39,
+      "started_at": "2026-11-08T14:54:31.898655+00:00",
+      "finished_at": "2026-11-08T14:54:38.287744+00:00",
+      "returned_tables": 5,
+      "unique_tables": 3
+    },
+    {
+      "case": "tencent",
+      "tool": "mx_hk_finance_data",
+      "query": "仅查询腾讯控股（00700.HK）截至2026年11月8日已公开的数据。请对2026年上半年累计和2026年第一季度两期，查询总收入、业务分部收入、经营活动现金流量净额、资本开支、自由现金流，以及仅针对公司股份回购的现金支付（排除员工激励购股）。每个数值保留原始指标名、币种、单位、累计/单季期间、披露日期和原文链接。明确自由现金流、资本开支、回购的定义；无法区分时明确不可用，不自行推算，不将港币交易对价和人民币现金流混用。只查询公开研究数据，不涉及账户、持仓或交易。",
+      "status": "response_received",
+      "tools_call_attempts": 1,
+      "elapsed_seconds": 6.63,
+      "started_at": "2026-11-08T14:54:56.511865+00:00",
+      "finished_at": "2026-11-08T14:55:03.145485+00:00",
+      "returned_tables": 8,
+      "unique_tables": 6
+    },
+    {
+      "case": "tencent_cny",
+      "tool": "mx_hk_finance_data",
+      "query": "仅查询腾讯控股00700.HK，报告期固定2026年6月30日中报，财务币种固定人民币CNY（原始报表币种），不要换算成港币或报价币种；不取其他报告期或日频事件。仅取营业总收入、经营活动产生现金流量净额、业务分部收入。要求保留原始人民币金额和单位、年初至期末累计口径、披露日期、指标原始名称和原始公告URL。数值尽量完整精度，不用亿或万缩写。没有精确值或原文链接则明确说明不可提供。",
+      "status": "response_received",
+      "tools_call_attempts": 1,
+      "elapsed_seconds": 7.5,
+      "started_at": "2026-11-08T14:56:13.121333+00:00",
+      "finished_at": "2026-11-08T14:56:20.625644+00:00",
+      "returned_tables": 3,
+      "unique_tables": 3
+    },
+    {
+      "case": "filings",
+      "tool": "mx_finance_search_notice",
+      "query": "仅检索以下发行人原始披露，不查新闻研报：贵州茅台600519的2026年第三季度报告和2026年半年报；腾讯控股00700.HK的2026年中期报告及2026年第二季度业绩公告。请返回公告标题、发行主体、披露日期、公开HTTPS原始PDF链接及相关原文片段。茅台片段关注直销/批发与产品销售结构；腾讯片段关注自由现金流定义、资本开支定义，以及仅股份回购现金支付和员工激励购股的区分。只要截至2026年11月8日已公开的文件，不推断缺失信息。",
+      "status": "response_received",
+      "tools_call_attempts": 1,
+      "elapsed_seconds": 8.66,
+      "started_at": "2026-11-08T14:57:31.910108+00:00",
+      "finished_at": "2026-11-08T14:57:40.565186+00:00",
+      "returned_tables": 1,
+      "unique_tables": 1
+    }
+  ],
+  "maotai_rounding_checks": {
+    "rounding_method": "Compare issuer exact value to half the last displayed decimal step; this does not certify missing currency or period metadata.",
+    "checks": [
+      {
+        "field": "合同负债",
+        "period_end": "2026-09-30",
+        "display": "20.84亿元",
+        "issuer_value_yuan": "2084485744.75",
+        "display_center_yuan": "2084000000.00",
+        "rounding_half_step_yuan": "500000.00",
+        "within_display_rounding": true,
+        "exact_precision_provided": false,
+        "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-10-31/1225649896.PDF"
+      },
+      {
+        "field": "合同负债",
+        "period_end": "2026-06-30",
+        "display": "31.78亿元",
+        "issuer_value_yuan": "3177561597.07",
+        "display_center_yuan": "3178000000.00",
+        "rounding_half_step_yuan": "500000.00",
+        "within_display_rounding": true,
+        "exact_precision_provided": false,
+        "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-08-15/1225475868.PDF"
+      },
+      {
+        "field": "营业收入",
+        "period_end": "2026-09-30",
+        "display": "1310亿元",
+        "issuer_value_yuan": "130970743649.04",
+        "display_center_yuan": "131000000000",
+        "rounding_half_step_yuan": "50000000",
+        "within_display_rounding": true,
+        "exact_precision_provided": false,
+        "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-10-31/1225649896.PDF"
+      },
+      {
+        "field": "营业收入",
+        "period_end": "2026-06-30",
+        "display": "907亿元",
+        "issuer_value_yuan": "90703260964.48",
+        "display_center_yuan": "90700000000",
+        "rounding_half_step_yuan": "50000000",
+        "within_display_rounding": true,
+        "exact_precision_provided": false,
+        "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-08-15/1225475868.PDF"
+      },
+      {
+        "field": "经营活动产生的现金流量净额",
+        "period_end": "2026-09-30",
+        "display": "840.6亿元",
+        "issuer_value_yuan": "84058979832.29",
+        "display_center_yuan": "84060000000.0",
+        "rounding_half_step_yuan": "5000000.0",
+        "within_display_rounding": true,
+        "exact_precision_provided": false,
+        "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-10-31/1225649896.PDF"
+      },
+      {
+        "field": "经营活动产生的现金流量净额",
+        "period_end": "2026-06-30",
+        "display": "706.9亿元",
+        "issuer_value_yuan": "70690750119.06",
+        "display_center_yuan": "70690000000.0",
+        "rounding_half_step_yuan": "5000000.0",
+        "within_display_rounding": true,
+        "exact_precision_provided": false,
+        "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-08-15/1225475868.PDF"
+      }
+    ],
+    "all_within_display_rounding": true
+  },
+  "public_pdf_verification": {
+    "generated_at": "2026-11-08T14:59:01.569743+00:00",
+    "source": "Miaoxiang notice links; public PDF retrieval without API key",
+    "results": [
+      {
+        "title": "贵州茅台:贵州茅台2026年第三季度报告",
+        "published": "2026-10-31 00:18:31",
+        "url": "https://pdf.dfcfw.com/pdf/H2_AN202610301831245500_1.pdf",
+        "http_status": 200,
+        "bytes": 193430,
+        "sha256": "96ba51ebf414f841bce79b3ba019927df2f795142392e12e96a9d559e96ebb9b",
+        "identical_to_previous_original": "maotai_q3_2026",
+        "local_pdf": "reports/validation/originals/mx_H2_AN202610301831245500_1.pdf"
+      },
+      {
+        "title": "贵州茅台:贵州茅台2026年半年度报告摘要",
+        "published": "2026-08-15 00:20:42",
+        "url": "https://pdf.dfcfw.com/pdf/H2_AN202608141827994403_1.pdf",
+        "http_status": 200,
+        "bytes": 147934,
+        "sha256": "9ba031b34a7f05caec0e71a154257b8b449fb0b18a58badd7e346fe66bc90313",
+        "identical_to_previous_original": null,
+        "local_pdf": "reports/validation/originals/mx_H2_AN202608141827994403_1.pdf"
+      },
+      {
+        "title": "贵州茅台:贵州茅台2026年半年度报告",
+        "published": "2026-08-15 00:20:41",
+        "url": "https://pdf.dfcfw.com/pdf/H2_AN202608141827994408_1.pdf",
+        "http_status": 200,
+        "bytes": 832321,
+        "sha256": "0e10aa26be46b1cf3cd03f06e834c7fb98d5dd0d661b96f8fddd4af7e846a4f6",
+        "identical_to_previous_original": "maotai_interim_2026",
+        "local_pdf": "reports/validation/originals/mx_H2_AN202608141827994408_1.pdf"
+      },
+      {
+        "title": "中期报告 2026",
+        "published": "2026-08-25 17:00:37",
+        "url": "https://pdf.dfcfw.com/pdf/H2_AN202608251828410860_1.PDF",
+        "http_status": 200,
+        "bytes": 5451089,
+        "sha256": "6231374bc3d7bd104fcebb7735f9692050b55be32fa0f34d7d7f20478efa71f1",
+        "identical_to_previous_original": null,
+        "local_pdf": "reports/validation/originals/mx_H2_AN202608251828410860_1.PDF"
+      },
+      {
+        "title": "截至二零二六年六月三十日止三个月及六个月业绩公布",
+        "published": "2026-08-12 16:31:46",
+        "url": "https://pdf.dfcfw.com/pdf/H2_AN202608121827904541_1.PDF",
+        "http_status": 200,
+        "bytes": 964094,
+        "sha256": "892cfe981b31e2c945b7b11d237ec2d98c97f4253867bb4fd11f6587c8896353",
+        "identical_to_previous_original": null,
+        "local_pdf": "reports/validation/originals/mx_H2_AN202608121827904541_1.PDF"
+      },
+      {
+        "title": "截至二零二六年三月三十一日止三个月业绩公布",
+        "published": "2026-05-13 16:31:35",
+        "url": "https://pdf.dfcfw.com/pdf/H2_AN202605131822268712_1.PDF",
+        "http_status": 200,
+        "bytes": 865653,
+        "sha256": "ef3baa5008e15b2c58203bc48ec1f8feda6ff34e29f70d484ffeedefd16dc310",
+        "identical_to_previous_original": null,
+        "local_pdf": "reports/validation/originals/mx_H2_AN202605131822268712_1.PDF"
+      }
+    ]
+  },
+  "field_findings": {
+    "maotai_operating_structure": "Product/channel breakdown returned; duplicate tables and denominator differences require reconciliation.",
+    "tencent_currency": "Broad and explicit CNY queries both returned HKD financial aggregates; segment tables explicitly use CNY. Do not combine or silently convert.",
+    "tencent_fcf": "Enterprise FCFF returned instead of issuer-defined free cash flow.",
+    "tencent_capex": "Returned capital-expenditure field definition is unverified; an unrequested 2025 annual/quarterly field also appeared.",
+    "tencent_buyback": "Daily buyback events returned instead of requested reporting-period cash payments excluding employee share purchases.",
+    "original_links": "Structured finance tools primarily return Choice/EM links; notice search returned public PDFs with publication timestamps.",
+    "history": "No authenticated historical as-filed acceptance test was performed."
+  },
+  "observed_cost": {
+    "source": "User account UI observations",
+    "data_calls": 4,
+    "whole_batch_points_decrease": 10.24,
+    "first_observed_stage_decrease": 3.44,
+    "second_observed_stage_decrease": 6.8,
+    "per_tool_price_verified": false,
+    "protocol_billing_attribution_verified": false
+  },
+  "safety": {
+    "credential_values_included": false,
+    "broker_or_trade_interfaces_connected": false,
+    "tools_used": [
+      "mx_ashare_finance_data",
+      "mx_hk_finance_data",
+      "mx_finance_search_notice"
+    ]
+  }
+}

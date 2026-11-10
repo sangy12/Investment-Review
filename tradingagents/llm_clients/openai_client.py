@@ -8,10 +8,12 @@ from urllib.parse import urlparse
 
 from langchain_core.messages import AIMessage
 from langchain_openai import ChatOpenAI
+from openai import APIError
 
 from .api_key_env import get_api_key_env
 from .base_client import BaseLLMClient, normalize_content
 from .capabilities import get_capabilities
+from .plan_errors import ChatGPTSubscriptionLimitError, is_subscription_usage_limit
 from .validators import validate_model
 
 logger = logging.getLogger(__name__)
@@ -200,6 +202,22 @@ class ChatGPTPlanChatOpenAI(NormalizedChatOpenAI):
             if isinstance(item, dict) and item.get("role") == "system":
                 item["role"] = "developer"
         return payload
+
+    def invoke(self, input, config=None, **kwargs):
+        try:
+            return super().invoke(input, config, **kwargs)
+        except APIError as exc:
+            if is_subscription_usage_limit(exc):
+                raise ChatGPTSubscriptionLimitError() from None
+            raise
+
+    async def ainvoke(self, input, config=None, **kwargs):
+        try:
+            return await super().ainvoke(input, config, **kwargs)
+        except APIError as exc:
+            if is_subscription_usage_limit(exc):
+                raise ChatGPTSubscriptionLimitError() from None
+            raise
 
 
 def _chatgpt_credential() -> Callable[[], str]:

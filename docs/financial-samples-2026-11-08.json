@@ -1,0 +1,372 @@
+{
+  "generated_at": "2026-11-08T14:20:49.662338+00:00",
+  "scope": "Dated sample reconciliation only. Original table labels and units were inspected; not a universal currency/unit mapping or historical-vintage guarantee.",
+  "originals": [
+    {
+      "name": "maotai_q3_2026",
+      "url": "https://static.cninfo.com.cn/finalpage/2026-10-31/1225649896.PDF",
+      "http_status": 200,
+      "bytes": 193430,
+      "sha256": "96ba51ebf414f841bce79b3ba019927df2f795142392e12e96a9d559e96ebb9b",
+      "local_pdf": "reports/validation/originals/maotai_q3_2026.pdf"
+    },
+    {
+      "name": "maotai_operating_q3_2026",
+      "url": "https://static.cninfo.com.cn/finalpage/2026-10-31/1225649906.PDF",
+      "http_status": 200,
+      "bytes": 86614,
+      "sha256": "97a72f8015a116aa370abb2a9ca2b926215e54b77509d4932537b3e82d5fada9",
+      "local_pdf": "reports/validation/originals/maotai_operating_q3_2026.pdf"
+    },
+    {
+      "name": "tencent_interim_2026",
+      "url": "https://www.tencent.com/wp-content/uploads/2026/08/E700_IR.pdf",
+      "http_status": 200,
+      "bytes": 5135808,
+      "sha256": "4170f80ec8548ea2fb92ec04691a4b252a52de20941e48fb516baf3f98082639",
+      "local_pdf": "reports/validation/originals/tencent_interim_2026.pdf"
+    },
+    {
+      "name": "tencent_q2_2026",
+      "url": "https://www.tencent.com/wp-content/uploads/2026/08/Tencent-Announces-2026-Second-Quarter-Results.pdf",
+      "http_status": 200,
+      "bytes": 412297,
+      "sha256": "64d8d2038eeef993571b96bb3361b6f1a567d6e84157eb16af20d2fd9a095f0a",
+      "local_pdf": "reports/validation/originals/tencent_q2_2026.pdf"
+    },
+    {
+      "name": "maotai_interim_2026",
+      "url": "https://static.cninfo.com.cn/finalpage/2026-08-15/1225475868.PDF",
+      "http_status": 200,
+      "bytes": 832321,
+      "sha256": "0e10aa26be46b1cf3cd03f06e834c7fb98d5dd0d661b96f8fddd4af7e846a4f6",
+      "local_pdf": "reports/validation/originals/maotai_interim_2026.pdf"
+    }
+  ],
+  "checks": [
+    {
+      "ticker": "600519.SS",
+      "period_end": "2026-09-30",
+      "field": "OPERATE_INCOME",
+      "issuer_label": "营业收入",
+      "vendor_value": "130970743649.04",
+      "currency": "CNY",
+      "unit": "yuan",
+      "period_basis": "year_to_date",
+      "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-10-31/1225649896.PDF",
+      "pdf_pages": [
+        1,
+        8
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "600519.SS",
+      "period_end": "2026-09-30",
+      "field": "TOTAL_OPERATE_INCOME",
+      "issuer_label": "营业总收入",
+      "vendor_value": "133283652508.95",
+      "currency": "CNY",
+      "unit": "yuan",
+      "period_basis": "year_to_date",
+      "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-10-31/1225649896.PDF",
+      "pdf_pages": [
+        8
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "600519.SS",
+      "period_end": "2026-06-30",
+      "field": "OPERATE_INCOME",
+      "issuer_label": "营业收入",
+      "vendor_value": "90703260964.48",
+      "currency": "CNY",
+      "unit": "yuan",
+      "period_basis": "year_to_date",
+      "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-08-15/1225475868.PDF",
+      "pdf_pages": [
+        5,
+        7,
+        30,
+        73,
+        74
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "600519.SS",
+      "period_end": "2026-06-30",
+      "field": "TOTAL_OPERATE_INCOME",
+      "issuer_label": "营业总收入",
+      "vendor_value": "92278072083.21",
+      "currency": "CNY",
+      "unit": "yuan",
+      "period_basis": "year_to_date",
+      "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-08-15/1225475868.PDF",
+      "pdf_pages": [
+        30
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "600519.SS",
+      "period_end": "2026-09-30",
+      "field": "TOTAL_ASSETS",
+      "issuer_label": "总资产",
+      "vendor_value": "318304891882.72",
+      "currency": "CNY",
+      "unit": "yuan",
+      "period_basis": "point_in_time",
+      "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-10-31/1225649896.PDF",
+      "pdf_pages": [
+        2,
+        6,
+        8
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "600519.SS",
+      "period_end": "2026-09-30",
+      "field": "CONTRACT_LIAB",
+      "issuer_label": "合同负债",
+      "vendor_value": "2084485744.75",
+      "currency": "CNY",
+      "unit": "yuan",
+      "period_basis": "point_in_time",
+      "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-10-31/1225649896.PDF",
+      "pdf_pages": [
+        7
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "600519.SS",
+      "period_end": "2026-06-30",
+      "field": "TOTAL_ASSETS",
+      "issuer_label": "总资产",
+      "vendor_value": "309050784569.31",
+      "currency": "CNY",
+      "unit": "yuan",
+      "period_basis": "point_in_time",
+      "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-08-15/1225475868.PDF",
+      "pdf_pages": [
+        5,
+        26,
+        28
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "600519.SS",
+      "period_end": "2026-06-30",
+      "field": "CONTRACT_LIAB",
+      "issuer_label": "合同负债",
+      "vendor_value": "3177561597.07",
+      "currency": "CNY",
+      "unit": "yuan",
+      "period_basis": "point_in_time",
+      "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-08-15/1225475868.PDF",
+      "pdf_pages": [
+        9,
+        27,
+        69,
+        74
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "600519.SS",
+      "period_end": "2026-09-30",
+      "field": "NETCASH_OPERATE",
+      "issuer_label": "经营活动现金流量净额",
+      "vendor_value": "84058979832.29",
+      "currency": "CNY",
+      "unit": "yuan",
+      "period_basis": "year_to_date",
+      "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-10-31/1225649896.PDF",
+      "pdf_pages": [
+        2,
+        11
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "600519.SS",
+      "period_end": "2026-06-30",
+      "field": "NETCASH_OPERATE",
+      "issuer_label": "经营活动现金流量净额",
+      "vendor_value": "70690750119.06",
+      "currency": "CNY",
+      "unit": "yuan",
+      "period_basis": "year_to_date",
+      "issuer_source": "https://static.cninfo.com.cn/finalpage/2026-08-15/1225475868.PDF",
+      "pdf_pages": [
+        5,
+        7,
+        34,
+        81
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "0700.HK",
+      "period_end": "2026-06-30",
+      "vendor_label": "营运收入",
+      "issuer_label": "Revenues",
+      "vendor_value": "401243000000.0",
+      "issuer_value": "401243",
+      "issuer_unit": "million_yuan",
+      "currency": "CNY",
+      "raw_per_issuer_unit": "1000000",
+      "period_basis": "year_to_date",
+      "issuer_source": "https://www.tencent.com/wp-content/uploads/2026/08/E700_IR.pdf",
+      "pdf_page": 25,
+      "numeric_occurrence_pages": [
+        5,
+        25,
+        46,
+        47
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "0700.HK",
+      "period_end": "2026-06-30",
+      "vendor_label": "股东应占溢利",
+      "issuer_label": "Profit attributable to equity holders",
+      "vendor_value": "114115000000.0",
+      "issuer_value": "114115",
+      "issuer_unit": "million_yuan",
+      "currency": "CNY",
+      "raw_per_issuer_unit": "1000000",
+      "period_basis": "year_to_date",
+      "issuer_source": "https://www.tencent.com/wp-content/uploads/2026/08/E700_IR.pdf",
+      "pdf_page": 25,
+      "numeric_occurrence_pages": [
+        5,
+        6,
+        19,
+        25,
+        30,
+        55,
+        56
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "0700.HK",
+      "period_end": "2026-06-30",
+      "vendor_label": "每股基本盈利",
+      "issuer_label": "Basic earnings per share",
+      "vendor_value": "12.639",
+      "issuer_value": "12.639",
+      "issuer_unit": "yuan_per_share",
+      "currency": "CNY",
+      "raw_per_issuer_unit": "1",
+      "period_basis": "year_to_date",
+      "issuer_source": "https://www.tencent.com/wp-content/uploads/2026/08/E700_IR.pdf",
+      "pdf_page": 25,
+      "numeric_occurrence_pages": [
+        5,
+        6,
+        19,
+        25,
+        55
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "0700.HK",
+      "period_end": "2026-06-30",
+      "vendor_label": "总资产",
+      "issuer_label": "Total assets",
+      "vendor_value": "2159394000000.0",
+      "issuer_value": "2159394",
+      "issuer_unit": "million_yuan",
+      "currency": "CNY",
+      "raw_per_issuer_unit": "1000000",
+      "period_basis": "point_in_time",
+      "issuer_source": "https://www.tencent.com/wp-content/uploads/2026/08/E700_IR.pdf",
+      "pdf_page": 27,
+      "numeric_occurrence_pages": [
+        27,
+        29
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "0700.HK",
+      "period_end": "2026-06-30",
+      "vendor_label": "经营业务现金净额",
+      "issuer_label": "Net cash flows generated from operating activities",
+      "vendor_value": "154061000000",
+      "issuer_value": "154061",
+      "issuer_unit": "million_yuan",
+      "currency": "CNY",
+      "raw_per_issuer_unit": "1000000",
+      "period_basis": "year_to_date",
+      "issuer_source": "https://www.tencent.com/wp-content/uploads/2026/08/E700_IR.pdf",
+      "pdf_page": 34,
+      "numeric_occurrence_pages": [
+        34
+      ],
+      "matched": true
+    },
+    {
+      "ticker": "0700.HK",
+      "period_end": "2026-06-30",
+      "vendor_label": "回购股份",
+      "issuer_label": "Payments for repurchase of shares",
+      "vendor_value": "24194000000",
+      "issuer_value": "22257",
+      "issuer_unit": "million_yuan",
+      "currency": "CNY",
+      "raw_per_issuer_unit": "1000000",
+      "period_basis": "year_to_date",
+      "issuer_source": "https://www.tencent.com/wp-content/uploads/2026/08/E700_IR.pdf",
+      "pdf_page": 35,
+      "numeric_occurrence_pages": [
+        35
+      ],
+      "matched": false,
+      "status": "mapping_mismatch",
+      "reason": "Vendor aggregate is not identical to issuer share-repurchase cash payments; reconcile employee share-scheme purchases before mapping."
+    },
+    {
+      "ticker": "0700.HK",
+      "period_end": "2026-03-31",
+      "vendor_label": "营运收入",
+      "issuer_label": "Revenues",
+      "vendor_value": "196458000000.0",
+      "issuer_value": "196458",
+      "issuer_unit": "million_yuan",
+      "currency": "CNY",
+      "raw_per_issuer_unit": "1000000",
+      "period_basis": "year_to_date",
+      "issuer_source": "https://www.tencent.com/wp-content/uploads/2026/08/Tencent-Announces-2026-Second-Quarter-Results.pdf",
+      "pdf_page": 5,
+      "numeric_occurrence_pages": [
+        5
+      ],
+      "matched": true
+    }
+  ],
+  "rejected_mapping": {
+    "ticker": "0700.HK",
+    "period_end": "2026-06-30",
+    "candidate": "营业额 as total Revenues",
+    "candidate_value_yuan": 396431000000,
+    "issuer_total_revenue_yuan": 401243000000,
+    "correct_sample_vendor_label": "营运收入",
+    "reason": "The candidate excludes 4812 million yuan of Others revenue. Do not rename this subtotal as total revenue."
+  },
+  "pending": [
+    "Tencent Q1 CFO/balance-sheet primary-document comparison",
+    "Tencent segment, FCF and capex field coverage in authenticated supplementary MCP",
+    "Maotai sales channels and product breakdown field coverage in authenticated supplementary MCP",
+    "Original publication time and historical as-filed versions",
+    "Account quota, per-tool consumption and caching rights"
+  ]
+}

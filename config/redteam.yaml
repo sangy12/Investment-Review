@@ -1,27 +1,41 @@
-# TradingAgents v0.7.1 opt-in profile. Official quick default is gpt-6-luna;
-# gpt-6.1-terra below is the user's requested override, not an upstream default.
+# TradingAgents v0.7.1 opt-in profile; both tiers follow the user's 2026-11-10 selection.
 llm_provider: chatgpt
 deep_think_provider: chatgpt
 quick_think_provider: chatgpt
-deep_think_llm: gpt-6-sol
-quick_think_llm: gpt-6.1-terra
+# Confirmed by the signed-in plan's /models on 2026-11-08; user corrected Sol to 6.1.
+deep_think_llm: gpt-6.1-sol
+quick_think_llm: gpt-6.1-sol
 # If unavailable, `ta-watchlist models` lists the signed-in plan's choices.
 # Record the chosen replacement and reason here; never silently switch providers.
 openai_reasoning_effort: high
+quick_think_reasoning_effort: high
+deep_think_reasoning_effort: max
 max_debate_rounds: 2
 max_risk_discuss_rounds: 2
 output_language: Chinese
+analysis_timezone: Asia/Shanghai
+direct_analyst_evidence: true
 max_tool_rounds: 20
 checkpoint_enabled: true
 data_vendors:
   core_stock_apis: yfinance
   fundamental_data: sec_edgar,yfinance
   news_data: yfinance
-  macro_data: fred
-# Optional AKShare candidate; defaults await the user's source comparison.
-# Uncomment after `pip install '.[china]'` to enable it only for A/H shares.
-# china_data_vendors:
-#   core_stock_apis: yfinance,akshare
-#   fundamental_data: sec_edgar,yfinance,akshare
-#   news_data: akshare,yfinance
-#   macro_data: akshare
+  macro_data: fred_public,fred
+# A/H: tested statements, A-share news and explicitly named China macro series.
+# US routing stays unchanged; HK news is not sent to the A-share numeric search.
+china_tool_vendors:
+  get_macro_indicators: akshare,fred_public,fred
+  get_news: yfinance,akshare
+  get_balance_sheet: sec_edgar,yfinance,akshare
+  get_cashflow: sec_edgar,yfinance,akshare
+  get_income_statement: sec_edgar,yfinance,akshare
+research_sources:
+  enabled: true
+  miaoxiang: true
+  futu_public: true
+  futu_community: true
+  consensus_snapshots: true
+  # Paid discovery refreshes only on a new financial reporting-period signature.
+  # Unknown reporting periods never trigger a paid request.
+  max_mcp_calls_per_ticker: 2

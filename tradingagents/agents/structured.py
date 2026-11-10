@@ -10,7 +10,8 @@ canonical pattern:
 2. At invocation, run the structured call and render the result back to
    markdown. If the structured call itself fails for any reason
    (malformed JSON from a weak model, transient provider issue), fall
-   back to a plain ``llm.invoke`` so the pipeline never blocks.
+   back to a plain ``llm.invoke``. A ChatGPT subscription quota error propagates
+   immediately: another output format cannot restore an exhausted quota.
 
 Centralising the pattern here keeps the agent factories small and ensures
 all three agents log the same warnings when fallback fires.
@@ -23,6 +24,8 @@ from collections.abc import Callable
 from typing import Any, TypeVar
 
 from pydantic import BaseModel
+
+from tradingagents.llm_clients.plan_errors import ChatGPTSubscriptionLimitError
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +76,9 @@ def invoke_structured(structured_llm: Any | None, prompt: Any, agent_name: str) 
             # as a structured miss and fall back, with a clear reason.
             raise ValueError("structured output returned no parsed result")
         return result
+    except ChatGPTSubscriptionLimitError:
+        # A different output format cannot restore the user's subscription quota.
+        raise
     except Exception as exc:
         logger.warning(
             "%s: structured-output invocation failed (%s); retrying once as free text",
@@ -88,7 +94,7 @@ def invoke_structured_or_freetext(
     render: Callable[[T], str],
     agent_name: str,
 ) -> str:
-    """Run the structured call and render to markdown; fall back to free-text on any failure."""
+    """Render a structured response; fall back except for terminal quota errors."""
     result = invoke_structured(structured_llm, prompt, agent_name)
     if result is not None:
         return render(result)

@@ -1,6 +1,7 @@
 """Acceptance of the wrapper with deterministic graph fixtures, not live LLM claims."""
 
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 import yaml
@@ -186,3 +187,158 @@ def test_china_vendor_routing_is_market_scoped():
     china = market_config(cfg, {"market": "HK"})
     assert china["data_vendors"]["fundamental_data"] == "sec_edgar,yfinance,akshare"
     assert cfg["data_vendors"]["fundamental_data"] == "sec_edgar,yfinance"
+
+
+def test_shared_sources_are_prepared_after_factory_and_archived_once(tmp_path, monkeypatch):
+    from tradingagents.watchlist import runner
+
+    events = []
+    packet = {"schema": 1, "ticker": "NVDA", "as_of": "2026-01-02", "items": [], "gaps": ["fixture gap"], "mcp_calls": 0}
+
+    def prepare(*args):
+        events.append("sources")
+        return packet
+
+    class SharedGraph(FakeGraph):
+        def __init__(self, config):
+            events.append("factory")
+            super().__init__(config)
+
+        def propagate(self, ticker, date):
+            events.append("graph")
+            assert "fixture gap" in self.config["shared_research_evidence"]
+            return super().propagate(ticker, date)
+
+    monkeypatch.setattr(runner, "prepare_evidence", prepare)
+    assert run_batch([POSITION], {"data_vendors": {}, "research_sources": {"enabled": True}},
+                     tmp_path, "2026-01-02", graph_factory=SharedGraph, reviewer=review_fixture,
+                     on_status=lambda _: None) == []
+    assert events == ["factory", "sources", "graph"]
+    run = next((tmp_path / "NVDA/runs").iterdir())
+    assert (run / "research_sources.json").exists()
+    assert "fixture gap" in (run / "complete_report.md").read_text()
+    assert "fixture gap" in (run / "complete_report.html").read_text()
+    assert history(tmp_path, "NVDA")[0]["source_packet_sha256"]
+
+
+def test_failed_subscription_factory_cannot_start_paid_sources(tmp_path, monkeypatch):
+    from tradingagents.watchlist import runner
+
+    prepare = Mock(side_effect=AssertionError("Must not spend"))
+    monkeypatch.setattr(runner, "prepare_evidence", prepare)
+
+    def factory(**kwargs):
+        raise RuntimeError("model access not available")
+
+    assert run_batch([POSITION], {"data_vendors": {}, "research_sources": {"enabled": True}},
+                     tmp_path, "2026-01-02", graph_factory=factory, on_status=lambda _: None)
+    prepare.assert_not_called()
+
+
+def test_runner_tracks_graph_and_review_and_archives_usage(tmp_path):
+    import json
+
+    from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
+    from langchain_core.messages import AIMessage
+
+    from tradingagents.watchlist.usage import usage_context
+
+    class MeasuredGraph(FakeGraph):
+        def __init__(self, config):
+            super().__init__(config)
+            msg = AIMessage(content="fixture", response_metadata={"model_name": "gpt-6.1-terra"},
+                            usage_metadata={"input_tokens": 100, "output_tokens": 30, "total_tokens": 130})
+            self.quick_thinking_llm = GenericFakeChatModel(messages=iter([msg, msg]))
+
+        def propagate(self, ticker, date):
+            self.quick_thinking_llm.invoke("fixture graph")
+            return super().propagate(ticker, date)
+
+    def reviewer(state, position, previous, llm):
+        llm.invoke("fixture review")
+        return review_fixture(state, position, previous, llm)
+
+    assert run_batch([POSITION], {"data_vendors": {}}, tmp_path, "2026-01-02",
+                     graph_factory=MeasuredGraph, reviewer=reviewer, on_status=lambda _: None) == []
+    run = next((tmp_path / "NVDA/runs").iterdir())
+    data = json.loads((run / "usage.json").read_text())
+    assert data["totals"]["total_tokens"] == 260
+    assert data["totals"]["completed_calls"] == 2
+    assert {r["phase"] for r in data["by_model_and_phase"]} == {"graph", "review"}
+    assert "260 token" in (run / "complete_report.md").read_text()
+    assert "260 token" in (run / "complete_report.html").read_text()
+    assert usage_context.get() is None
+
+
+def test_usage_context_restored_after_interruption(tmp_path):
+    import json
+
+    from tradingagents.watchlist.usage import usage_context
+
+    def factory(**kwargs):
+        raise KeyboardInterrupt
+
+    with pytest.raises(KeyboardInterrupt):
+        run_batch([POSITION], {"data_vendors": {}}, tmp_path, "2026-01-02",
+                  graph_factory=factory, on_status=lambda _: None)
+    data = json.loads(next((tmp_path / "NVDA/usage").glob("*.json")).read_text())
+    assert data["status"] == "interrupted"
+    assert usage_context.get() is None
+
+
+def test_subscription_limit_stops_batch_and_structured_retry(tmp_path):
+    import json
+
+    from tradingagents.agents.structured import invoke_structured_or_freetext
+    from tradingagents.llm_clients.plan_errors import ChatGPTSubscriptionLimitError
+
+    structured = Mock()
+    structured.invoke.side_effect = ChatGPTSubscriptionLimitError()
+    plain = Mock()
+    called = []
+
+    class LimitedGraph(FakeGraph):
+        def propagate(self, ticker, date):
+            called.append(ticker)
+            invoke_structured_or_freetext(structured, plain, "fixture", str, "Trader")
+
+    failures = run_batch([POSITION, {**POSITION, "ticker": "AAPL"}], {"data_vendors": {}},
+                         tmp_path, "2026-01-02", graph_factory=LimitedGraph, on_status=lambda _: None)
+    assert called == ["NVDA"]
+    structured.invoke.assert_called_once()
+    plain.invoke.assert_not_called()
+    assert failures[0]["error_code"] == "subscription_usage_limit"
+    data = json.loads((tmp_path / "last_batch.json").read_text())
+    assert "未执行" in data["outcomes"]["AAPL"]
+
+
+def test_resume_only_requires_matching_checkpoint_before_inference(tmp_path, monkeypatch):
+    import json
+
+    from tradingagents.watchlist import runner
+
+    packet = {"schema": 1, "ticker": "NVDA", "as_of": "2026-01-02", "items": [], "gaps": [], "mcp_calls": 0}
+    prepare = Mock(return_value=packet)
+    monkeypatch.setattr(runner, "prepare_evidence", prepare)
+    propagate = Mock(return_value=(state(), "Hold"))
+
+    class ResumeGraph(FakeGraph):
+        step = None
+
+        def checkpoint_resume_step(self, ticker, date):
+            return self.step
+
+        def propagate(self, ticker, date):
+            return propagate(ticker, date)
+
+    cfg = {"data_vendors": {}, "research_sources": {"enabled": True}}
+    assert run_batch([POSITION], cfg, tmp_path, "2026-01-02", graph_factory=ResumeGraph,
+                     reviewer=review_fixture, on_status=lambda _: None, resume_only=True)
+    propagate.assert_not_called()
+    assert prepare.call_args.kwargs == {"cached_only": True}
+    ResumeGraph.step = 6
+    assert not run_batch([POSITION], cfg, tmp_path, "2026-01-02", graph_factory=ResumeGraph,
+                         reviewer=review_fixture, on_status=lambda _: None, resume_only=True)
+    propagate.assert_called_once()
+    run = next((tmp_path / "NVDA/runs").iterdir())
+    assert json.loads((run / "usage.json").read_text())["resumed_from_step"] == 6

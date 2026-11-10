@@ -69,7 +69,10 @@ def run_probes(output):
     jobs = {
         "yahoo_nvda": "yahoo_nvda", "yahoo_maotai": "yahoo_maotai", "yahoo_tencent": "yahoo_tencent",
         "akshare_maotai": "akshare_a_origin", "akshare_tencent": "akshare_hk_origin",
+        "akshare_maotai_balance": "akshare_a_origin", "akshare_maotai_cashflow": "akshare_a_origin",
+        "akshare_tencent_balance": "akshare_hk_origin", "akshare_tencent_cashflow": "akshare_hk_origin",
         "futu_tencent_news": "futu_news",
+        "futu_tencent_notice": "futu_news", "futu_tencent_research": "futu_news",
     }
     data, enabled = [], []
     for job, origin in jobs.items():

@@ -11,6 +11,7 @@ free-text generation and the rating is read from that text.
 from __future__ import annotations
 
 from tradingagents.agents.context import (
+    direct_analyst_evidence,
     get_instrument_context_from_state,
     get_language_instruction,
     get_portfolio_context_from_state,
@@ -44,6 +45,7 @@ def create_portfolio_manager(llm):
 {instrument_context}
 
 {portfolio_context}
+{direct_analyst_evidence(state)}
 
 ---
 

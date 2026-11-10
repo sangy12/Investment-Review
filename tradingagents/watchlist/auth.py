@@ -2,7 +2,83 @@
 
 import json
 import os
+from contextlib import suppress
 from pathlib import Path
+
+
+def read_private_terminal(prompt):
+    """Accept a secret only at a trusted terminal, without an echoed fallback."""
+    import sys
+
+    if not sys.stdin.isatty():
+        raise EOFError("Paste the callback in an interactive trusted terminal")
+    if os.name == "posix":
+        return _read_posix_secret(prompt, sys.stdin.fileno(), sys.stderr)
+    return _read_getpass_secret(prompt, sys.stderr)
+
+
+def _read_getpass_secret(prompt, output):
+    import getpass
+    import warnings
+
+    # getpass normally falls back to echoed input when terminal control fails.
+    # Refuse that fallback: callbacks and provider keys are credentials.
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", getpass.GetPassWarning)
+            return getpass.getpass(prompt, stream=output)
+    except getpass.GetPassWarning:
+        raise EOFError("Terminal cannot hide callback input") from None
+
+
+def _read_posix_secret(prompt, descriptor, output):
+    """No echo, no canonical 4095-byte line truncation; restore tty on every exit."""
+    import atexit
+    import termios
+
+    previous = termios.tcgetattr(descriptor)
+    current = termios.tcgetattr(descriptor)
+    current[3] &= ~(termios.ECHO | termios.ECHONL | termios.ICANON)
+    current[6][termios.VMIN] = 1
+    current[6][termios.VTIME] = 0
+    value = bytearray()
+
+    def restore():
+        with suppress(OSError):
+            termios.tcsetattr(descriptor, termios.TCSADRAIN, previous)
+
+    # A successful HTTP callback can end the main process while the daemon
+    # paste-reader is waiting. Restore tty state on that path as well.
+    atexit.register(restore)
+    try:
+        termios.tcsetattr(descriptor, termios.TCSAFLUSH, current)
+        output.write(prompt)
+        output.flush()
+        while True:
+            char = os.read(descriptor, 1)
+            if not char or char == b"\x04":
+                raise EOFError("Secret input ended")
+            if char in (b"\r", b"\n"):
+                return value.decode("utf-8")
+            if char in (b"\x7f", b"\x08"):
+                if value:
+                    value.pop()
+            elif char == b"\x15":
+                value.clear()
+            else:
+                value.extend(char)
+            if len(value) > 65536:
+                raise EOFError("Secret input exceeds maximum length")
+    finally:
+        restore()
+        atexit.unregister(restore)
+        output.write("\n")
+        output.flush()
+
+
+def read_login_callback():
+    """Accept a loopback redirect only at a trusted terminal, without echoing it."""
+    return read_private_terminal("完整回调地址（输入隐藏，粘贴后按回车）：")
 
 
 def bootstrap_auth(source=None):

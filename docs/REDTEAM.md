@@ -29,7 +29,9 @@ ta-watchlist compare NVDA
 
 两层 provider 均固定为 `chatgpt`，不自动降级到 API 付费方式。深度层仅用于原有两个经理，快速层供其余原有角色；消费层额外使用快速层模型做一次结构化摘要与逐条核对。
 
-默认请求：深度 `gpt-6-sol`、快速 `gpt-6.1-terra`、推理 `high`、辩论各两轮、工具上限 20、中文输出，内部辩论仍为英文。注意：v0.7.1 官方快速默认实际为 `gpt-6-luna`，本项目的 Terra 是用户指定值。
+当前红队配置（2026-11-10 用户调整）：快速 `gpt-6.1-sol` / `high`，深度 `gpt-6.1-sol` / `max`，辩论各两轮、工具上限 20、中文输出。型号已在登录后的套餐清单确认；分层请求参数已离线校验，本次配置调整没有消耗真实模型用量。
+
+`quick_think_reasoning_effort` / `deep_think_reasoning_effort` 分别覆盖两层 OpenAI/ChatGPT 推理强度，未设置时继承 `openai_reasoning_effort`。环境变量分别为 `TRADINGAGENTS_QUICK_THINK_REASONING_EFFORT` / `TRADINGAGENTS_DEEP_THINK_REASONING_EFFORT`，同名分层环境变量覆盖 YAML。有效值记录进快照及报告头；改变推理设置会使用新的断点签名。
 
 登录后以 `ta-watchlist models` 返回的实际套餐清单为准。运行会先核对两个型号是否可用；若不可用，先从清单中选定推理能力最强的深度型号、较快且能力强的快速型号，修改 YAML 并在相邻注释记录替换原因。尚无凭据时无法知道套餐可用型号，不能声称已替换或已测试。当前实现不会推测陌生型号的性能排行并静默替换。
 
@@ -61,20 +63,25 @@ reports/
 
 每份合并报告先显示评级、Investment Thesis 支撑证据、风险清单、与上次运行的变化，再显示完整原文。摘要有原文逐字引文和来源文件；不匹配原文的引用会被剔除。模型引用正确不等于推论必然正确，仍须核对原始公告/财报。
 
+ChatGPT 用量按本次执行记录在 `reports/<标的>/usage/<运行ID>.json`，随每次模型完成实时累加；成功报告另存 `usage.json`，Markdown/HTML 和快照也含用量。统计覆盖并行分析师、辩论、经理、历史记忆结算（若有）及最终结构化摘要，区分模型和 graph/review 阶段。输入/输出/合计来自接口返回，缓存输入已包含在输入内，推理已包含在输出内；未返回用量的调用单独计数。它不是套餐额度百分比或 API 账单，也不包括 SDK 内部不可见的 HTTP 重试。断点恢复仅统计本次执行，前次用量需查前次记录，不据此冒称完整报告总量；接入记录器之前的旧报告也无法完整追溯。
+
+OpenAI 返回 Subscription Sharing usage limit 时，程序停止批次，不再以自由文本格式重试，也不切换到 API key。额度重置后使用 `bash scripts/cloud.sh run --only 600519.SS --resume-only` 恢复匹配断点。恢复优先读取原断点保存的来源材料及缺口说明，并核对标的、分析日和完整配置签名；不重新查付费补充源。找不到匹配断点时不发起模型调用。用量记录的 `resumed_from_step` 标明本次是否续跑，统计单份报告时需要合并对应的前次执行记录。
+
 `compare` 不再次调用模型，读取最近一次成功分析日及该次保存的前次基准。评级轨迹包含每个运行 ID。历史日期补跑不读取其分析日之后的报告。失效条件仅提取自原报告 PM 的 Investment Thesis 中明确给出的条件，缺失时显示“无核对基准”。逐条状态为：触发、未触发、证据不足；后两者不会混为一谈。证据引用缺失/不合法时强制改为证据不足。
 
 变量以名称匹配并保留期间、币种和单位，不自动计算不可比口径的增减。新增风险按原文字符串比较，措辞改写可能被列为新增，摘要会注明这一限制。首份报告没有上次基准。
 
 ## A 股／港股数据
 
-候选源比较见 [DATA_SOURCES.md](DATA_SOURCES.md)。AKShare 是已实现但默认不启用的候选适配器。选择它时，取消 `config/redteam.yaml` 中 `china_data_vendors` 的注释。仅 A/H 标的会使用该配置，美股继续原链：
+新增免费补充源已按用户采纳方案启用：FRED 官方下载、三市场盈利预测及富途港股社区，见 [接入说明](FREE_SOURCE_INTEGRATION.md)。数据按日缓存并共享，历史请求不会读取当前预测、社区或修订宏观快照；形成日期与口径缺失仍为 UNKNOWN。
+
+候选源比较见 [DATA_SOURCES.md](DATA_SOURCES.md)，已采纳的接入与缓存见 [SOURCE_INTEGRATION.md](SOURCE_INTEGRATION.md)。红队 profile 已仅对 A/H 三表启用 AKShare 兜底，美股继续原链：
 
 ```yaml
-china_data_vendors:
-  core_stock_apis: yfinance,akshare
-  fundamental_data: sec_edgar,yfinance,akshare
-  news_data: akshare,yfinance
-  macro_data: akshare
+china_tool_vendors:
+  get_balance_sheet: sec_edgar,yfinance,akshare
+  get_cashflow: sec_edgar,yfinance,akshare
+  get_income_statement: sec_edgar,yfinance,akshare
 ```
 
 适配器支持 A/H 不复权日线、三张报表与公司资料，A 股新闻、国内财经快讯，以及 CPI/GDP/LPR。`china_cpi`、`china_gdp`、`china_lpr` 显式命名，不能将美联储利率悄悄替换为中国 LPR。AKShare 失败使用原有 vendor 异常体系，链顺序不变。历史财报/资料、修订宏观值在请求前返回 `DATA_UNAVAILABLE`，不把当前值倒填。报告期结束日不等于披露日，有披露日期也不等于具备原始历史版本。

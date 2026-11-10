@@ -14,7 +14,7 @@ from tradingagents.dataflows.config import run_config, run_config_context, set_c
 from tradingagents.dataflows.date_window import get_current_date, is_historical
 from tradingagents.dataflows.symbols import safe_ticker_component
 from tradingagents.default_config import DEFAULT_CONFIG
-from tradingagents.llm_clients import create_tier_client, tier_provider
+from tradingagents.llm_clients import create_tier_client, tier_provider, tier_reasoning_effort
 from tradingagents.memory import TradingMemoryLog, settlement
 from tradingagents.memory.reflection import Reflector
 from tradingagents.reporting import write_report_tree
@@ -147,7 +147,8 @@ class TradingAgentsGraph:
         resume must not carry reports that other settings produced. Only where
         the run keeps its files and how it retries are left out.
         """
-        settings = {k: v for k, v in self.config.items() if k not in _NOT_IN_SIGNATURE}
+        settings = {k: v for k, v in self.config.items() if k not in _NOT_IN_SIGNATURE
+                    and not (k in {"quick_think_reasoning_effort", "deep_think_reasoning_effort"} and not v)}
         digest = hashlib.sha256(json.dumps(settings, sort_keys=True, default=str).encode()).hexdigest()[:12]
         return "|".join([
             "analysts=" + ",".join(self.selected_analysts),
@@ -218,6 +219,13 @@ class TradingAgentsGraph:
             logger.info("Starting fresh for %s on %s", company_name, trade_date)
         return thread_id(company_name, str(trade_date), signature)
 
+    def checkpoint_resume_step(self, company_name, trade_date, asset_type: str = "stock", portfolio=None):
+        """Inspect a matching checkpoint without starting any model calls."""
+        if not self.config.get("checkpoint_enabled"):
+            return None
+        return checkpoint_step(self.config["data_cache_dir"], company_name, str(trade_date),
+                               self._run_signature(asset_type, portfolio))
+
     def checkpoint_input(self, init_state):
         """The value to stream/invoke: ``None`` to resume an existing checkpoint,
         else the initial state for a fresh run.
@@ -264,8 +272,10 @@ class TradingAgentsGraph:
             "llm_provider": cfg.get("llm_provider"),
             "deep_think_provider": tier_provider(cfg, "deep") if cfg.get("llm_provider") else None,
             "deep_think_llm": cfg.get("deep_think_llm"),
+            "deep_think_reasoning_effort": tier_reasoning_effort(cfg, "deep") if cfg.get("llm_provider") else None,
             "quick_think_provider": tier_provider(cfg, "quick") if cfg.get("llm_provider") else None,
             "quick_think_llm": cfg.get("quick_think_llm"),
+            "quick_think_reasoning_effort": tier_reasoning_effort(cfg, "quick") if cfg.get("llm_provider") else None,
             "analysts": list(self.selected_analysts),
             "max_debate_rounds": cfg.get("max_debate_rounds"),
             "max_risk_discuss_rounds": cfg.get("max_risk_discuss_rounds"),
@@ -298,11 +308,16 @@ class TradingAgentsGraph:
         and loads them alongside the analysts (see ``_memory_step``).
         """
         trade_date = _validate_trade_date(trade_date)
+        context = self.resolve_instrument_context(company_name, asset_type, trade_date)
+        # The watchlist consumer fetches this once. No agent can trigger paid
+        # supplemental calls; graph shape and decision prompts remain unchanged.
+        if self.config.get("shared_research_evidence"):
+            context += "\n\n" + self.config["shared_research_evidence"]
         return self.propagator.create_initial_state(
             company_name,
             trade_date,
             asset_type=asset_type,
-            instrument_context=self.resolve_instrument_context(company_name, asset_type, trade_date),
+            instrument_context=context,
             portfolio_context=portfolio.render(company_name) if portfolio is not None else "",
         )
 

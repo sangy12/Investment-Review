@@ -53,6 +53,12 @@ _retry_after = 0.0            # no renewal attempt in this process before this t
 class ChatGPTAuthError(RuntimeError):
     """Signing in or refreshing failed; the message says what to do."""
 
+    def __init__(self, message, *, code="auth_error", http_status=None, oauth_error=None):
+        super().__init__(message)
+        self.code = code
+        self.http_status = http_status
+        self.oauth_error = oauth_error
+
 
 class ChatGPTUnreachable(ChatGPTAuthError):
     """OpenAI could not be reached or was busy; the sign-in itself is still good."""
@@ -110,7 +116,7 @@ def _signing_keys() -> list[dict]:
         keys = requests.get(JWKS_URL, timeout=TIMEOUT).json()["keys"]
     except (requests.RequestException, ValueError, KeyError, TypeError) as exc:
         raise ChatGPTUnreachable(f"Could not reach OpenAI to check the sign-in ({type(exc).__name__}); "
-                                 "try again.") from None
+                                 "try again.", code="signing_keys_unreachable") from None
     return keys if isinstance(keys, list) else []
 
 
@@ -133,13 +139,16 @@ def _validated_claims(id_token: str, client_id: str, nonce: str | None, keys: li
                       padding.PKCS1v15(), hashes.SHA256())
         claims = json.loads(_b64url_decode(payload_b64))
     except (InvalidSignature, ValueError, KeyError, TypeError, AttributeError):
-        raise ChatGPTAuthError("ChatGPT sign-in returned an ID token OpenAI's keys do not verify.") from None
+        raise ChatGPTAuthError("ChatGPT sign-in returned an ID token OpenAI's keys do not verify.",
+                               code="id_token_signature_invalid") from None
     audience = claims.get("aud")
     audiences = audience if isinstance(audience, list) else [audience]
     if (claims.get("iss") != ISSUER or client_id not in audiences or not claims.get("sub")
             or claims.get("exp", 0) + 5 < time.time()
             or (nonce is not None and claims.get("nonce") != nonce)):
-        raise ChatGPTAuthError("ChatGPT sign-in returned an ID token that does not match this sign-in.")
+        code = ("id_token_nonce_mismatch" if nonce is not None and claims.get("nonce") != nonce
+                else "id_token_claims_invalid")
+        raise ChatGPTAuthError("ChatGPT sign-in returned an ID token that does not match this sign-in.", code=code)
     return claims
 
 
@@ -171,17 +180,31 @@ def _token_request(form: dict, task: str, refused: str) -> dict:
     try:
         response = requests.post(TOKEN_URL, timeout=TIMEOUT, data=form)
     except requests.RequestException as exc:
-        raise ChatGPTUnreachable(f"Could not reach OpenAI to {task} ({type(exc).__name__}); try again.") from None
+        raise ChatGPTUnreachable(f"Could not reach OpenAI to {task} ({type(exc).__name__}); try again.",
+                                 code="token_network_error") from None
+    # Only standard fixed OAuth codes may appear in safe CLI diagnostics.
+    # Do not expose arbitrary server messages, response bodies, or submitted data.
+    oauth_error = _oauth_error(response) if response.status_code != 200 else None
+    safe_oauth_error = oauth_error if isinstance(oauth_error, str) and oauth_error in {
+        "invalid_grant", "invalid_client", "invalid_request", "access_denied", "invalid_scope",
+        "unauthorized_client", "unsupported_grant_type", "server_error", "temporarily_unavailable",
+        "invalid_resource",
+    } else None
     if response.status_code in (408, 429) or response.status_code >= 500:
-        raise ChatGPTUnreachable(f"OpenAI could not {task} now ({_oauth_error(response)}); try again.")
+        raise ChatGPTUnreachable(f"OpenAI could not {task} now ({oauth_error}); try again.",
+                                 code="token_service_unavailable", http_status=response.status_code,
+                                 oauth_error=safe_oauth_error)
     if response.status_code != 200:
-        raise ChatGPTAuthError(f"OpenAI did not {task} ({_oauth_error(response)}); {refused}.")
+        raise ChatGPTAuthError(f"OpenAI did not {task} ({oauth_error}); {refused}.",
+                               code="token_request_refused", http_status=response.status_code,
+                               oauth_error=safe_oauth_error)
     try:
         body = response.json()
     except ValueError:
         body = None
     if not isinstance(body, dict) or not isinstance(body.get("access_token"), str):
-        raise ChatGPTUnreachable(f"OpenAI's answer could not be read when asked to {task}; try again.")
+        raise ChatGPTUnreachable(f"OpenAI's answer could not be read when asked to {task}; try again.",
+                                 code="token_response_invalid")
     return body
 
 
@@ -364,18 +387,19 @@ def sign_in(say: Callable[[str], None] = print, read_line: Callable[[], str] = i
 
         threading.Thread(target=read_pasted, daemon=True).start()
         if not callback.received.wait(timeout):
-            raise ChatGPTAuthError("Signing in with ChatGPT timed out; run `tradingagents login chatgpt` again.")
+            raise ChatGPTAuthError("Signing in with ChatGPT timed out; run `tradingagents login chatgpt` again.",
+                                   code="login_timeout")
     finally:
         server.shutdown()
         server.server_close()
 
     answer = callback.params
     if answer.get("error"):
-        raise ChatGPTAuthError(f"ChatGPT sign-in was not completed ({answer['error']}).")
+        raise ChatGPTAuthError(f"ChatGPT sign-in was not completed ({answer['error']}).", code="consent_not_completed")
     issued = answer.get("client_id") or client_id
     if issued == DYNAMIC_CLIENT_ID or (account.get("client_id") and issued != account["client_id"]):
         raise ChatGPTAuthError("ChatGPT sign-in did not register TradingAgents; run "
-                               "`tradingagents logout chatgpt`, then sign in again.")
+                               "`tradingagents logout chatgpt`, then sign in again.", code="client_registration_failed")
     keys = _signing_keys()
     body = _token_request({"grant_type": "authorization_code", "client_id": issued,
                            "code": answer.get("code", ""), "code_verifier": verifier,
@@ -384,10 +408,10 @@ def sign_in(say: Callable[[str], None] = print, read_line: Callable[[], str] = i
     claims = _validated_claims(body.get("id_token") or "", issued, nonce, keys)
     if account.get("subject") and claims["sub"] != account["subject"]:
         raise ChatGPTAuthError(f"This machine is signed in as {account.get('email') or 'another account'}; "
-                               "run `tradingagents logout chatgpt` first.")
+                               "run `tradingagents logout chatgpt` first.", code="account_mismatch")
     if PLAN_SCOPE not in (body.get("scope") or "").split():
         raise ChatGPTAuthError("ChatGPT did not allow TradingAgents to use your plan; "
-                               "sign in again and approve plan usage.")
+                               "sign in again and approve plan usage.", code="plan_scope_missing")
     AUTH_FILE.parent.mkdir(parents=True, exist_ok=True)
     with locked(AUTH_FILE):
         replaced = _read().get("tokens")
