@@ -282,6 +282,8 @@ class TradingAgentsGraph:
             "output_language": cfg.get("output_language"),
             "data_vendors": dict(cfg.get("data_vendors") or {}),
             "tool_vendors": dict(cfg.get("tool_vendors") or {}),
+            "statement_freshness": dict(cfg.get("statement_freshness") or {}),
+            "fundamental_review": bool(cfg.get("fundamental_review")),
         }
 
     def save_reports(self, final_state, ticker, save_path=None, html=True) -> Path:

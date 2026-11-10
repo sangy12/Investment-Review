@@ -201,6 +201,12 @@ def _prepare_evidence(position, date, cfg, *, cached_only=False, refresh=False):
     if date != today():
         packet["gaps"].append("DATA_UNAVAILABLE: 历史补充材料无已核验 as-filed 版本；请求前拒绝当前快照。")
         return packet
+    if options.get("hkex_official") and position["market"] == "HK":
+        from tradingagents.watchlist.hkex import prepare_hkex_evidence
+
+        items, gaps = prepare_hkex_evidence(position, date, cfg, cached_only=cached_only)
+        packet["items"].extend(items)
+        packet["gaps"].extend(gaps)
     if options.get("consensus_snapshots") or options.get("futu_community"):
         from tradingagents.watchlist.free_sources import prepare_free_evidence
 
@@ -310,7 +316,7 @@ def _attach_documents(packet, cfg, cached_only):
                     path.chmod(0o600)
                     text_path = path.with_suffix(".txt")
                     if shutil.which("pdftotext"):
-                        subprocess.run(["pdftotext", str(path), str(text_path)], timeout=15, capture_output=True, check=True)
+                        subprocess.run(["pdftotext", "-layout", str(path), str(text_path)], timeout=15, capture_output=True, check=True)
                     _write(meta, {"document_sha256": hashlib.sha256(content).hexdigest(),
                                   "document_retrieved_on": packet["as_of"], "document_status": "cached_pdf"})
                 if meta.exists() and path.exists():
@@ -336,6 +342,16 @@ def _attach_documents(packet, cfg, cached_only):
                             for offset in dict.fromkeys(starts)
                         ]
                         item["primary_pdf_scope"] = "Literal pdftotext passages only; issuer, table units and summary figures still require reconciliation."
+                        if item.get("source") == "HKEX issuer filing" and item.get("financial_report"):
+                            from tradingagents.watchlist.hkex import (
+                                financial_passages,
+                                financial_period,
+                            )
+
+                            passages = financial_passages(source_text)
+                            item["primary_pdf_passages"] = passages
+                            item["period"] = financial_period(passages)
+                            item["primary_pdf_scope"] = "Literal financial-statement pages; see page_truncated. Amounts remain in each page's explicit currency/units; no conversion."
                 else:
                     item["document_status"] = "not_downloaded"
         except Exception as exc:

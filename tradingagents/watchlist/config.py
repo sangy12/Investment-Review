@@ -92,4 +92,9 @@ def market_config(cfg, position):
     else:
         cfg.pop("china_data_vendors", None)
         cfg.pop("china_tool_vendors", None)
+    # Explicit market rules override the legacy combined A/H block. A partial
+    # market map preserves unrelated base routes, and never affects another run.
+    market = position["market"]
+    cfg["data_vendors"].update(cfg.pop("market_data_vendors", {}).get(market, {}))
+    cfg.setdefault("tool_vendors", {}).update(cfg.pop("market_tool_vendors", {}).get(market, {}))
     return cfg

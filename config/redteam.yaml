@@ -27,11 +27,25 @@ data_vendors:
 china_tool_vendors:
   get_macro_indicators: akshare,fred_public,fred
   get_news: yfinance,akshare
-  get_balance_sheet: sec_edgar,yfinance,akshare
-  get_cashflow: sec_edgar,yfinance,akshare
-  get_income_statement: sec_edgar,yfinance,akshare
+market_tool_vendors:
+  A_SHARE:
+    get_balance_sheet: akshare,yfinance
+    get_cashflow: akshare,yfinance
+    get_income_statement: akshare,yfinance
+  HK:
+    get_balance_sheet: akshare,yfinance
+    get_cashflow: akshare,yfinance
+    get_income_statement: akshare,yfinance
+statement_freshness:
+  enabled: true
+  compare_markets: [A_SHARE, HK]
+  # Conservative alarm thresholds, not assertions of a mandatory report date.
+  max_age_days: {US: 275, A_SHARE: 160, HK: 275}
+  annual_max_age_days: 550
+fundamental_review: true
 research_sources:
   enabled: true
+  hkex_official: true
   miaoxiang: true
   futu_public: true
   futu_community: true

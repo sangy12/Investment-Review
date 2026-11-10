@@ -82,3 +82,20 @@ def test_router_retains_order_and_falls_back_to_akshare(monkeypatch):
     with run_config({"data_vendors": {"fundamental_data": "sec_edgar,yfinance,akshare"}}):
         assert route_to_vendor("get_income_statement", "600519.SS") == "China financials"
     assert calls == ["edgar", "yahoo", "akshare"]
+
+
+def test_a_share_limits_dates_before_fetch_and_keeps_ytd_contract(monkeypatch):
+    dates = [f"{year}-12-31" for year in range(2000, 2027)] + ["2026-06-30", "2026-09-30", "2099-12-31"]
+    session = Mock()
+    session.get.side_effect = [
+        Mock(text='<input value="1" id="hidctype" />'),
+        Mock(json=lambda: {"data": [{"REPORT_DATE": d} for d in dates]}),
+        Mock(json=lambda: {"data": [{"REPORT_DATE": "2026-09-30", "CURRENCY": "CNY", "TOTAL_OPERATE_INCOME": 100}]}),
+    ]
+    monkeypatch.setattr(vendor.requests, "Session", lambda: Mock(__enter__=Mock(return_value=session), __exit__=Mock(return_value=False)))
+    frame = vendor._recent_a_statement("stock_profit_sheet_by_report_em", "SH600519", 4, "2026-11-10", "quarterly")
+    assert len(frame) == 1 and frame.iloc[0]["CURRENCY"] == "CNY"
+    assert session.get.call_count == 3
+    last = session.get.call_args.kwargs
+    assert last["params"]["dates"] == "2026-09-30,2026-06-30,2025-12-31,2024-12-31"
+    assert last["params"]["reportType"] == "1" and last["timeout"] == 10

@@ -1,0 +1,240 @@
+{
+  "as_of": "2026-11-10",
+  "model_calls": 0,
+  "miaoxiang_calls": 0,
+  "observations": [
+    {
+      "ticker": "0100.HK",
+      "method": "get_income_statement",
+      "vendor": "akshare",
+      "latest_period": "2026-06-30",
+      "period_age_days": 133,
+      "as_of": "2026-11-10",
+      "observations": [
+        {
+          "vendor": "akshare",
+          "latest_period": "2026-06-30",
+          "period_age_days": 133
+        },
+        {
+          "vendor": "yfinance",
+          "status": "no_usable_statement"
+        }
+      ],
+      "official_reference_period": "2026-06-30",
+      "coverage": "latest among successful configured vendors checked; latest issuer disclosure UNKNOWN",
+      "currency_rule": "Use explicit table currency/unit only; listing or quote currency is not evidence."
+    },
+    {
+      "ticker": "0100.HK",
+      "method": "get_cashflow",
+      "seconds": 9.6,
+      "vendor": "akshare",
+      "latest_period": "2026-06-30",
+      "period_age_days": 133,
+      "as_of": "2026-11-10",
+      "observations": [
+        {
+          "vendor": "akshare",
+          "latest_period": "2026-06-30",
+          "period_age_days": 133
+        },
+        {
+          "vendor": "yfinance",
+          "status": "rejected",
+          "reason": "2025-12-31 precedes official report 2026-06-30",
+          "latest_period": "2025-12-31"
+        }
+      ],
+      "official_reference_period": "2026-06-30",
+      "coverage": "latest among successful configured vendors checked; official reference, if present, comes from bounded discovery, not an exhaustive archive",
+      "currency_rule": "Use explicit table currency/unit only; listing or quote currency is not evidence."
+    },
+    {
+      "ticker": "0100.HK",
+      "method": "get_balance_sheet",
+      "vendor": "akshare",
+      "latest_period": "2026-06-30",
+      "period_age_days": 133,
+      "as_of": "2026-11-10",
+      "observations": [
+        {
+          "vendor": "akshare",
+          "latest_period": "2026-06-30",
+          "period_age_days": 133
+        },
+        {
+          "vendor": "yfinance",
+          "latest_period": "2026-06-30",
+          "period_age_days": 133
+        }
+      ],
+      "official_reference_period": "2026-06-30",
+      "coverage": "latest among successful configured vendors checked; latest issuer disclosure UNKNOWN",
+      "currency_rule": "Use explicit table currency/unit only; listing or quote currency is not evidence."
+    },
+    {
+      "ticker": "0700.HK",
+      "method": "get_income_statement",
+      "vendor": "akshare",
+      "latest_period": "2026-06-30",
+      "period_age_days": 133,
+      "as_of": "2026-11-10",
+      "observations": [
+        {
+          "vendor": "akshare",
+          "latest_period": "2026-06-30",
+          "period_age_days": 133
+        },
+        {
+          "vendor": "yfinance",
+          "latest_period": "2026-06-30",
+          "period_age_days": 133
+        }
+      ],
+      "official_reference_period": "UNKNOWN",
+      "coverage": "latest among successful configured vendors checked; latest issuer disclosure UNKNOWN",
+      "currency_rule": "Use explicit table currency/unit only; listing or quote currency is not evidence."
+    },
+    {
+      "ticker": "0700.HK",
+      "method": "get_cashflow",
+      "vendor": "akshare",
+      "latest_period": "2026-06-30",
+      "period_age_days": 133,
+      "as_of": "2026-11-10",
+      "observations": [
+        {
+          "vendor": "akshare",
+          "latest_period": "2026-06-30",
+          "period_age_days": 133
+        },
+        {
+          "vendor": "yfinance",
+          "status": "no_usable_statement"
+        }
+      ],
+      "official_reference_period": "UNKNOWN",
+      "coverage": "latest among successful configured vendors checked; latest issuer disclosure UNKNOWN",
+      "currency_rule": "Use explicit table currency/unit only; listing or quote currency is not evidence."
+    },
+    {
+      "ticker": "0700.HK",
+      "method": "get_balance_sheet",
+      "vendor": "akshare",
+      "latest_period": "2026-06-30",
+      "period_age_days": 133,
+      "as_of": "2026-11-10",
+      "observations": [
+        {
+          "vendor": "akshare",
+          "latest_period": "2026-06-30",
+          "period_age_days": 133
+        },
+        {
+          "vendor": "yfinance",
+          "latest_period": "2026-06-30",
+          "period_age_days": 133
+        }
+      ],
+      "official_reference_period": "UNKNOWN",
+      "coverage": "latest among successful configured vendors checked; latest issuer disclosure UNKNOWN",
+      "currency_rule": "Use explicit table currency/unit only; listing or quote currency is not evidence."
+    },
+    {
+      "ticker": "600519.SS",
+      "method": "get_income_statement",
+      "seconds": 15.3,
+      "vendor": "akshare",
+      "latest_period": "2026-09-30",
+      "period_age_days": 41,
+      "as_of": "2026-11-10",
+      "observations": [
+        {
+          "vendor": "akshare",
+          "latest_period": "2026-09-30",
+          "period_age_days": 41
+        },
+        {
+          "vendor": "yfinance",
+          "latest_period": "2026-09-30",
+          "period_age_days": 41
+        }
+      ],
+      "official_reference_period": "UNKNOWN",
+      "coverage": "latest among successful configured vendors checked; official reference, if present, comes from bounded discovery, not an exhaustive archive",
+      "currency_rule": "Use explicit table currency/unit only; listing or quote currency is not evidence."
+    },
+    {
+      "ticker": "600519.SS",
+      "method": "get_cashflow",
+      "seconds": 11.9,
+      "vendor": "akshare",
+      "latest_period": "2026-09-30",
+      "period_age_days": 41,
+      "as_of": "2026-11-10",
+      "observations": [
+        {
+          "vendor": "akshare",
+          "latest_period": "2026-09-30",
+          "period_age_days": 41
+        },
+        {
+          "vendor": "yfinance",
+          "latest_period": "2026-09-30",
+          "period_age_days": 41
+        }
+      ],
+      "official_reference_period": "UNKNOWN",
+      "coverage": "latest among successful configured vendors checked; official reference, if present, comes from bounded discovery, not an exhaustive archive",
+      "currency_rule": "Use explicit table currency/unit only; listing or quote currency is not evidence."
+    },
+    {
+      "ticker": "600519.SS",
+      "method": "get_balance_sheet",
+      "seconds": 15.2,
+      "vendor": "akshare",
+      "latest_period": "2026-09-30",
+      "period_age_days": 41,
+      "as_of": "2026-11-10",
+      "observations": [
+        {
+          "vendor": "akshare",
+          "latest_period": "2026-09-30",
+          "period_age_days": 41
+        },
+        {
+          "vendor": "yfinance",
+          "latest_period": "2026-09-30",
+          "period_age_days": 41
+        }
+      ],
+      "official_reference_period": "UNKNOWN",
+      "coverage": "latest among successful configured vendors checked; official reference, if present, comes from bounded discovery, not an exhaustive archive",
+      "currency_rule": "Use explicit table currency/unit only; listing or quote currency is not evidence."
+    }
+  ],
+  "hkex": {
+    "ticker": "0100.HK",
+    "official_period": "2026-06-30",
+    "pdf_pages": [
+      33,
+      35,
+      36,
+      39,
+      40
+    ],
+    "mcp_calls": 0,
+    "scope": "bounded index + literal statement pages, not full-note review"
+  },
+  "currency": {
+    "ticker": "0100.HK",
+    "quote": "HKD",
+    "issuer_report": "USD thousands",
+    "eastmoney_hk_f10_amount": "CNY base currency units for monetary rows",
+    "basis": "East Money own page modules LRB/XJLLB/ZCFZB, not market-default inference",
+    "fx_ratio_observed": 6.8109,
+    "fx_usage": "reconciliation only, not a live FX quote"
+  },
+  "a_share_bounded_recheck": true
+}

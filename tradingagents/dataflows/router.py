@@ -6,6 +6,7 @@ from tradingagents.dataflows.errors import (
     VendorNotConfiguredError,
     VendorUnavailableError,
 )
+from tradingagents.dataflows.statement_quality import assess, policy_for, select
 from tradingagents.dataflows.vendors import akshare as akshare_vendor
 from tradingagents.dataflows.vendors.alpha_vantage import (
     get_balance_sheet as get_alpha_vantage_balance_sheet,
@@ -244,6 +245,8 @@ def route_to_vendor(method: str, *args, **kwargs):
     last_unavailable: VendorUnavailableError | None = None
     failed: Exception | None = None     # a vendor that raised something untyped
     first_error: Exception | None = None
+    statement_policy = policy_for(method, args, kwargs, get_config())
+    candidates, observations = [], []
     for vendor in vendor_chain:
         if method == "get_macro_indicators" and vendor == "akshare":
             indicator = args[0] if args else kwargs.get("indicator")
@@ -258,19 +261,32 @@ def route_to_vendor(method: str, *args, **kwargs):
             result = impl_func(*args, **kwargs)
             if method == "get_news" and vendor == "yfinance" and "akshare" in vendor_chain and isinstance(result, str) and result.startswith("<") and "unavailable for" in result:
                 raise VendorUnavailableError("Yahoo news does not cover the requested window")
+            if statement_policy:
+                observation = assess(result, vendor, statement_policy)
+                candidates.append((observation, result))
+                observations.append(observation)
+                if statement_policy["market"] in statement_policy.get("compare_markets", []):
+                    continue
+                return select(candidates, observations, statement_policy)
             return result
         except VendorUnavailableError as e:
+            if statement_policy:
+                observations.append({"vendor": vendor, "status": "vendor_unavailable"})
             logger.warning("Vendor %r unavailable for %s: %s; trying next vendor.", vendor, method, e)
             # Kept so an all-unavailable chain can say the vendor was the
             # problem, rather than reporting nothing about the symbol.
             last_unavailable = e
             continue
         except VendorNotConfiguredError as e:
+            if statement_policy:
+                observations.append({"vendor": vendor, "status": "not_configured"})
             logger.warning("Vendor %r not configured for %s; trying next vendor.", vendor, method)
             if first_error is None:
                 first_error = e  # Surface it if no other vendor can serve the call.
             continue
         except NoMarketDataError as e:
+            if statement_policy:
+                observations.append(getattr(e, "statement_observation", {"vendor": vendor, "status": "no_usable_statement"}))
             last_no_data = e  # No data here; another configured vendor may have it
             continue
         except Exception as e:
@@ -281,7 +297,12 @@ def route_to_vendor(method: str, *args, **kwargs):
             if first_error is None:
                 first_error = e
             failed = e
+            if statement_policy:
+                observations.append({"vendor": vendor, "status": type(e).__name__})
             continue
+
+    if candidates:
+        return select(candidates, observations, statement_policy)
 
     # A vendor that throttled or failed the request never said whether it has
     # the symbol, so no other vendor's "no data" can speak for the whole chain:

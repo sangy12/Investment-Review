@@ -11,6 +11,53 @@ from tradingagents.dataflows.vendors.yahoo.fundamentals import get_company_profi
 logger = logging.getLogger(__name__)
 
 
+def fundamental_review_instruction(role: str) -> str:
+    """Opt-in research duties; adding a prompt does not add a web-search tool."""
+    from tradingagents.dataflows.config import get_config
+
+    if not get_config().get("fundamental_review"):
+        return ""
+    common = (
+        " This is a long-term fundamental red-team review. Keep that horizon distinct from short-term technical timing."
+        " Separate source facts, management claims, third-party opinions and assumptions. Cite original URLs and dates."
+        " A larger reasoning budget is not additional research. You can only retrieve through the tools actually offered;"
+        " do not claim an internet search, full-document reading or verification you did not perform."
+    )
+    duties = {
+        "fundamentals": (
+            " Financial analysis is the core deliverable. Review the latest available reporting period and comparable prior periods,"
+            " not only the last week's events. Read the shared official statement pages, and reconcile all three statements with vendor tables."
+            " Start with a coverage table: provider, statement, latest period, disclosure date, retrieval date, issuer reporting currency,"
+            " vendor amount currency, units, and standalone-quarter versus year-to-date basis. Mark unknown fields UNKNOWN."
+            " Never use listing currency as reporting currency or silently combine converted CNY with original USD."
+            " Explain revenue drivers and segment mix, comparable growth and gross margins, R&D and operating costs, IFRS versus adjusted losses,"
+            " operating cash flow versus earnings, working-capital movements, capital spending and cash-flow reconciliation."
+            " Distinguish cash equivalents from investments/restricted balances, financing inflows from operating cash generation,"
+            " and debt/convertibles/equity awards from basic share counts. Read available notes and disclose missing notes."
+            " Build evidence-based bear/base/bull operating and valuation scenarios, with explicit assumptions,"
+            " ARR versus recognized revenue, EV-to-equity and fully diluted per-share bridges where relevant."
+            " Do not infer runway from net loss. Do not extrapolate incomparable periods."
+            " End with a ranked evidence-gap table and which missing evidence could reverse the thesis."
+            " If a required input is unavailable, mark the affected conclusion incomplete instead of filling the gap with generic prose."
+        ),
+        "news": (
+            " Prioritize material issuer and industry events over price-movement headlines: earnings, products, monetization, competitors,"
+            " financing, regulation and management guidance. Review a 90-day event context and older thesis-relevant disclosures supplied"
+            " in the packet, while identifying what changed in the last week. For each event give original publication date, event date,"
+            " source, issuer match, materiality and its causal link to revenue, margins, cash needs or dilution."
+            " Read supplied primary excerpts, deduplicate syndicated versions, and do not count two price headlines as independent catalysts."
+            " State when only a headline was available. A sparse feed is incomplete coverage, not evidence of no important events."
+        ),
+        "sentiment": (
+            " Your remit is short-term investor narratives, not financial truth. Show sample size, observation window, platform coverage,"
+            " duplicate/advertising limitations and competing narratives. Use the shared HK community evidence if supplied;"
+            " missing US-platform coverage does not establish no HK discussion. Do not infer sentiment percentages from a few posts,"
+            " turn price changes into fundamental evidence, or count a repeated story as independent confirmation."
+        ),
+    }
+    return common + duties.get(role, "")
+
+
 def direct_analyst_evidence(state) -> str:
     """Carry the original reports to managers, without treating them as verified facts."""
     from tradingagents.dataflows.config import get_config

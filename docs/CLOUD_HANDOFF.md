@@ -1,5 +1,9 @@
 # 新 Codex Cloud 环境交接
 
+2026-11-10 财报新鲜度/研究深度后续修复见 [SOURCE_QUALITY_AND_RESEARCH_DEPTH.md](SOURCE_QUALITY_AND_RESEARCH_DEPTH.md)：A/H 三表首源改为 AKShare/East Money、Yahoo 为备用，市场可独立配置；增加非空期间/过旧/官方已知期间校验和跨源期间比较。港股官方 HKEXnews 公告与完整定期报告发现已接入共享材料，MiniMax 实测保留五页财务原文含现金流续页。确认当前东方财富 HK F10 三表的金额为供应商换算 CNY，不能按港股默认 HKD，也不能与发行人 USD'000 混算。A 股改为先限最近四期再抓表，避免原函数遍历全历史。红队专用 analyst 职责已加强财务深度与重大事件筛选，但通用互联网 deep research 循环尚未实现；旧报告未重跑。主配置与两个私有活跃 profile 已同步，私有妙想预算仍为0，未调用模型/妙想或交易接口。
+
+本轮验收：MiniMax/腾讯三表至2026-06-30、茅台三表至2026-09-30，共9项生产路由读取成功；茅台新抓取约12—15秒，三表均显式CNY。离线回归1533项及100个子测试通过，1项可选依赖跳过、1项deselected，Ruff通过。公开验收记录在 `docs/source-quality-validation-2026-11-10.json`，原始CSV/PDF仅放私有运行目录。
+
 新对话迁移流程见 [NEW_CHAT_RESTORE.md](NEW_CHAT_RESTORE.md)。代码将保存到当前同名远端分支；私有资料为仓库外 AES-GCM 加密包，密钥单独保存，须由用户安全取走并在目标环境恢复，不能假定新任务自动继承。恢复工具默认不导入认证；认证只通过可信终端明确启用种子导入。
 
 最新模型设置：用户在2026-11-10要求快速改为 `gpt-6.1-sol/high`、深度改为 `gpt-6.1-sol/max`，已更新主 profile 与 MiniMax 私有后续运行配置。已实现分层 reasoning_effort，未设置时沿用全局值；请求参数及报告元数据通过离线测试。此前 MiniMax 实际执行配置另存 `.runtime/minimax/redteam.executed-20261110.yaml`，原报告仍记录原 Sol/Terra/high 设置。本次没有重跑报告或发起模型调用。下文旧型号描述是历史验收记录。

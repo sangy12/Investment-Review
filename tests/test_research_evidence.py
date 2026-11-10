@@ -104,7 +104,7 @@ def test_profile_enables_tested_china_statements_news_and_macro():
     assert "akshare" not in str(us["tool_vendors"])
     assert set(hk["tool_vendors"]) - set(us["tool_vendors"]) == {
         "get_income_statement", "get_cashflow", "get_balance_sheet", "get_news", "get_macro_indicators"}
-    assert hk["tool_vendors"]["get_income_statement"] == "sec_edgar,yfinance,akshare"
+    assert hk["tool_vendors"]["get_income_statement"] == "akshare,yfinance"
 
 
 def test_shared_context_reaches_real_graph_without_llm_or_graph_shape_change():

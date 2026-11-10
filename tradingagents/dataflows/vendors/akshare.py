@@ -10,6 +10,7 @@ import re
 from datetime import timedelta
 
 import pandas as pd
+import requests
 
 from tradingagents.dataflows.config import get_config
 from tradingagents.dataflows.date_window import get_current_date, is_historical
@@ -37,10 +38,45 @@ def _call(name, **kwargs):
     except ImportError:
         raise VendorNotConfiguredError("Install tradingagents[china] to use AKShare") from None
     try:
+        if name in {"stock_balance_sheet_by_report_em", "stock_profit_sheet_by_report_em", "stock_cash_flow_sheet_by_report_em"} and "report_limit" in kwargs:
+            return _recent_a_statement(name, **kwargs)
         return getattr(ak, name)(**kwargs)
     except Exception as exc:
         # Do not echo URLs/cookies from upstream exceptions.
         raise VendorUnavailableError(f"AKShare {name} failed ({type(exc).__name__})") from None
+
+
+def _recent_a_statement(name, symbol, report_limit, as_of_date, freq):
+    """AKShare's public East Money contract, restricted BEFORE downloading tables.
+
+    Upstream's by-report functions loop through every historic five-date batch.
+    Keep the same company-type discovery and reportType=1 (YTD) semantics, but
+    fetch only the latest requested report dates. Each HTTP request is bounded.
+    """
+    prefix = {"stock_balance_sheet_by_report_em": "zcfzb", "stock_profit_sheet_by_report_em": "lrb",
+              "stock_cash_flow_sheet_by_report_em": "xjllb"}[name]
+    base = "https://emweb.securities.eastmoney.com/PC_HSF10/NewFinanceAnalysis/"
+    with requests.Session() as session:
+        response = session.get(base + "Index", params={"type": "web", "code": symbol.lower()}, timeout=10)
+        response.raise_for_status()
+        element = re.search(r'<input\b[^>]*\bid=["\']hidctype["\'][^>]*>', response.text, re.I)
+        ctype = re.search(r'\bvalue=["\'](\d+)["\']', element[0], re.I) if element else None
+        if not ctype:
+            raise ValueError("missing_company_type")
+        params = {"companyType": ctype[1], "reportDateType": "0", "code": symbol}
+        response = session.get(base + prefix + "DateAjaxNew", params=params, timeout=10)
+        response.raise_for_status()
+        raw = pd.DataFrame(response.json().get("data", []))
+        if "REPORT_DATE" not in raw:
+            raise ValueError("missing_report_dates")
+        periods = pd.to_datetime(raw["REPORT_DATE"], errors="coerce").dropna().dt.strftime("%Y-%m-%d")
+        dates = sorted({p for p in periods if p <= as_of_date and (freq != "annual" or p.endswith("-12-31"))}, reverse=True)[:report_limit]
+        if not dates:
+            raise ValueError("no_eligible_report_dates")
+        response = session.get(base + prefix + "AjaxNew", timeout=10,
+                               params={**params, "reportType": "1", "dates": ",".join(dates)})
+        response.raise_for_status()
+        return pd.DataFrame(response.json().get("data", []))
 
 
 def _date(value):
@@ -119,7 +155,7 @@ def _statement(ticker, freq, as_of_date, kind):
         frame = _call("stock_financial_hk_report_em", stock=code, symbol=chinese,
                       indicator="年度" if freq == "annual" else "报告期")
     else:
-        frame = _call(method, symbol=vendor_symbol)
+        frame = _call(method, symbol=vendor_symbol, report_limit=4, as_of_date=date, freq=freq)
     if frame is None or frame.empty or "REPORT_DATE" not in frame:
         raise NoMarketDataError(ticker, detail="missing AKShare financial statements/report dates")
     frame = frame.copy()
@@ -134,11 +170,21 @@ def _statement(ticker, freq, as_of_date, kind):
     # Keep all line items for the latest four reporting periods, especially HK long tables.
     dates = sorted(frame["REPORT_DATE"].dropna().astype(str).unique(), reverse=True)[:4]
     frame = frame[frame["REPORT_DATE"].astype(str).isin(dates)]
+    # This is an endpoint contract verified against East Money's own LRB,
+    # XJLLB and ZCFZB page modules (2026-11-10), not a .HK -> currency guess.
+    # AMOUNT also contains EPS/ratios: a monetary currency is not every row's unit.
+    amount_currency = ("CNY (East Money HK F10 statement-page contract; vendor-converted, not issuer currency)"
+                       if market == "HK" else "explicit upstream currency fields only, otherwise UNKNOWN")
     return _csv(frame, f"{ticker} {chinese}; current snapshot {date}; {freq}; "
+                f"latest reporting period {max(dates)[:10] if dates else 'UNKNOWN'}; "
+                f"monetary amount currency: {amount_currency}; "
                 "frequency selects reporting dates, NOT standalone quarters. Balance sheets are point-in-time; "
                 "income/cashflow periods may be year-to-date (HK may be interim). "
                 "Vendor line-item labels require issuer reconciliation: HK 营业额 and 营运收入 may differ. "
-                "use explicit upstream currency/unit fields only; if absent they are UNKNOWN, "
+                "quote currency, issuer reporting currency and upstream amount currency are distinct. "
+                "use explicit upstream currency/unit fields or the named verified endpoint contract only; otherwise UNKNOWN, "
+                "HK listing does not imply HKD statements, A-share listing does not prove CNY amounts. "
+                "Monetary AMOUNT values use base currency units; EPS/share/ratio rows retain their own definitions. "
                 "do not assume quote currency or combine amounts with other sources")
 
 
