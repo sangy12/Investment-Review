@@ -1,5 +1,7 @@
 # 新 Codex Cloud 环境交接
 
+2026-11-10 币种独立复核见 [CURRENCY_DOUBLECHECK_20261110.md](CURRENCY_DOUBLECHECK_20261110.md)：以公司官方财报及央行汇率核验AKShare原始返回，MiniMax三表美元金额×6.8109、港交所公司港币归母净利×0.86855、腾讯人民币现金×1，共五项残差均为0。结论限定当前`stock_financial_hk_report_em`货币金额样本，不概括所有AKShare接口或发行人列报币种；该函数底层确实是东方财富，不能当成独立数据商。未更改渠道政策、未调用模型/妙想或交易接口。
+
 2026-11-10 财报新鲜度/研究深度后续修复见 [SOURCE_QUALITY_AND_RESEARCH_DEPTH.md](SOURCE_QUALITY_AND_RESEARCH_DEPTH.md)：A/H 三表首源改为 AKShare/East Money、Yahoo 为备用，市场可独立配置；增加非空期间/过旧/官方已知期间校验和跨源期间比较。港股官方 HKEXnews 公告与完整定期报告发现已接入共享材料，MiniMax 实测保留五页财务原文含现金流续页。确认当前东方财富 HK F10 三表的金额为供应商换算 CNY，不能按港股默认 HKD，也不能与发行人 USD'000 混算。A 股改为先限最近四期再抓表，避免原函数遍历全历史。红队专用 analyst 职责已加强财务深度与重大事件筛选，但通用互联网 deep research 循环尚未实现；旧报告未重跑。主配置与两个私有活跃 profile 已同步，私有妙想预算仍为0，未调用模型/妙想或交易接口。
 
 本轮验收：MiniMax/腾讯三表至2026-06-30、茅台三表至2026-09-30，共9项生产路由读取成功；茅台新抓取约12—15秒，三表均显式CNY。离线回归1533项及100个子测试通过，1项可选依赖跳过、1项deselected，Ruff通过。公开验收记录在 `docs/source-quality-validation-2026-11-10.json`，原始CSV/PDF仅放私有运行目录。
